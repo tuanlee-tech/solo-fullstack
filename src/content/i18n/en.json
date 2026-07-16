@@ -1,0 +1,10 @@
+{
+  "page.editLink": "Edit this page",
+  "page.lastUpdated": "Last updated:",
+  "page.nextLink": "Next",
+  "page.previousLink": "Previous",
+  "tableOfContents.onThisPage": "On this page",
+  "tableOfContents.overview": "Overview",
+  "search.label": "Search docs",
+  "404.text": "Page not found. Check the URL or try using the search bar."
+}
