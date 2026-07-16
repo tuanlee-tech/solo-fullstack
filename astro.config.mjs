@@ -151,9 +151,9 @@ export default defineConfig({
         '@fontsource/inter',
         './src/styles/custom.css'
       ],
-      social: {
-        github: 'https://github.com/tuanlee-tech/solo-fullstack',
-      },
+      social: [
+        { icon: 'github', label: 'GitHub', href: 'https://github.com/tuanlee-tech/solo-fullstack' }
+      ],
 
       defaultLocale: 'root',
       locales: {
