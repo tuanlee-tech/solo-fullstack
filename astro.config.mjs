@@ -1,6 +1,8 @@
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 
+import cloudflare from '@astrojs/cloudflare';
+
 // Resolve site URL theo môi trường:
 // 1. SITE_URL  → set thủ công trong CF Pages → Production (custom domain hoặc pages.dev)
 // 2. CF_PAGES_URL → tự động inject bởi Cloudflare Pages → Preview deployments
@@ -12,6 +14,7 @@ const SITE_URL =
 
 export default defineConfig({
   site: SITE_URL,
+
   integrations: [
     starlight({
       title: 'Solo Fullstack',
@@ -162,4 +165,6 @@ export default defineConfig({
       },
     }),
   ],
+
+  adapter: cloudflare(),
 });
