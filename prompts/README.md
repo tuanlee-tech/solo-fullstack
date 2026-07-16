@@ -10,6 +10,7 @@ Thư mục này chứa các prompt và memory files để làm việc hiệu qu�
 | [`convert-markdown-to-mdx.md`](./convert-markdown-to-mdx.md) | Chuyển file Markdown bài giảng → MDX đẹp | Khi có nội dung raw Markdown cần format |
 | [`new-doc-page.md`](./new-doc-page.md) | Tạo trang tài liệu mới từ đầu | Khi cần viết trang hoàn toàn mới |
 | [`review-improve-mdx.md`](./review-improve-mdx.md) | Review & cải thiện UI/UX trang MDX hiện có | Khi trang hiện tại chưa đẹp/nhất quán |
+| [`translate-mdx.md`](./translate-mdx.md) | Dịch file MDX sang ngôn ngữ khác | Khi làm đa ngôn ngữ (i18n), dịch nhưng giữ nguyên UI/component |
 | [`add-sidebar-item.md`](./add-sidebar-item.md) | Thêm mục vào sidebar config | Khi thêm trang mới vào navigation |
 
 ---
