@@ -1,0 +1,79 @@
+---
+title: Roadmap Overview
+description: Bản đồ toàn cảnh lộ trình Solo Fullstack — 3 khối lõi chung và 2 nhánh sự nghiệp.
+sidebar:
+  order: 1
+---
+
+# Lộ Trình Solo Fullstack: Tổng Quan
+
+> **Định hướng:** Xây nền tảng fullstack vững chắc, dùng chung cho 2 con đường — **Staff/Architect** hoặc **Solo Founder** — rồi rẽ nhánh dựa trên hoàn cảnh thực tế.
+> **Nguyên tắc:** Học theo chiều ngang (Project-based). Ưu tiên điểm chung trước, rẽ nhánh sau.
+> **Thời gian:** Lõi chung 9–12 tháng (kịch bản lạc quan); thực tế 11–21 tháng.
+> **Ngôn ngữ:** JavaScript/TypeScript ecosystem.
+
+## Tại sao tách lõi chung và rẽ nhánh
+
+Hai con đường cần kỹ năng khác nhau ở giai đoạn nâng cao (Kafka/service mesh cho Staff vs sales/validate cho Founder). Giải quyết bằng cách học **lõi chung** trước, dừng ở **điểm rẽ nhánh** để đánh giá, rồi chọn nhánh.
+
+```
+┌─────────────────────────────────────────────┐
+│  LÕI CHUNG (bắt buộc cho cả 2 nhánh)        │
+│  Thời gian: 9–12 tháng                      │
+└─────────────────────────────────────────────┘
+                    ↓
+      ═══ ĐIỂM RẼ NHÁNH (checkpoint) ═══
+                    ↓
+    ┌───────────────┬──────────────────┐
+    │ Nhánh A       │ Nhánh B          │
+    │ Staff/Architect│ Solo Founder    │
+    │ 12–24 tháng   │ Liên tục         │
+    └───────────────┴──────────────────┘
+```
+
+## 3 Khối Lõi
+
+| Khối | Mục tiêu | Thời gian |
+|------|----------|-----------|
+| **K1 Master Frontend** | Sẵn sàng phỏng vấn Senior FE (30–45 triệu) | 3–6 tháng |
+| **K2 Master Backend** | Tự build API vững, tích hợp payment/search/email/AI | 6–12 tháng |
+| **K3 DevOps Cơ Bản** | Solo deploy 1 dự án hoàn chỉnh lên production | 2–3 tháng |
+
+## Điểm rẽ nhánh — Tiêu chí quyết định
+
+| Tiêu chí | Nghiêng A (Staff) | Nghiêng B (Founder) |
+|----------|-------------------|---------------------|
+| Tài chính | Chưa có runway 6–12 tháng | Đã có tiết kiệm đủ sống 6–12 tháng |
+| Ý tưởng | Chưa validate | Đã có tín hiệu user thật |
+| Tìm việc | Offer Senior tốt | Thị trường khó, offer kém |
+| Ràng buộc | Cần thu nhập ổn định | Ít ràng buộc, chấp nhận rủi ro |
+
+> Đây không phải quyết định vĩnh viễn. Có thể đi A vài năm rồi rẽ B, hoặc ngược lại.
+
+## Stack Đề Xuất (2026)
+
+| Layer | Công nghệ |
+|-------|-----------|
+| Frontend | Next.js 14+ App Router + Tailwind + shadcn/ui |
+| Backend | Next.js API Routes → NestJS |
+| Database | PostgreSQL (Neon / Supabase) |
+| AI / LLM | Anthropic/OpenAI API + pgvector |
+| Cache | Redis (Upstash / Railway) |
+| Auth | Clerk / NextAuth.js / Supabase Auth |
+| Payment | Stripe |
+| Search | Meilisearch → Elasticsearch (Branch A) |
+| Email | Resend / Postmark |
+| Monitoring | Sentry + OpenTelemetry |
+| Analytics | PostHog / Plausible |
+| Deploy | Vercel (FE) → Railway/Render (BE) |
+| CI/CD | GitHub Actions |
+| Domain | Cloudflare |
+
+## Cam kết & Kỷ luật
+
+- Học mỗi ngày ít nhất 2 giờ
+- Cuối tuần làm project (4–8 giờ)
+- Không xem tutorial passive — pause, code theo, tự làm lại
+- Mỗi tháng 1 project nhỏ hoàn chỉnh
+- Checkpoint 3 tháng/lần — đánh giá lại tiến độ
+- Giữ nhịp bền vững, không burnout

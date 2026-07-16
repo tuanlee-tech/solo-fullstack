@@ -1,0 +1,255 @@
+---
+title: Solo Fullstack Roadmap Overview
+description: A complete map of the journey from React to Staff/Architect or Solo Founder — horizontal learning, project-based.
+---
+
+import { Steps, Tabs, TabItem, CardGrid, LinkCard, Icon, Badge } from '@astrojs/starlight/components';
+
+<div class="modern-card accent-info" style={{ marginBottom: '2rem' }}>
+  <h3>
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    Strategic Direction
+  </h3>
+  <p>
+    Build a solid fullstack foundation shared across 2 career paths — <strong>Staff/Architect (employment)</strong> or <strong>Solo Founder (entrepreneurship)</strong> — then branch based on real circumstances, not gut feelings.
+    <br/><br/>
+    <strong>Principle:</strong> Horizontal learning (Project-based) · <strong>Core duration:</strong> 9–12 months · <strong>Ecosystem:</strong> JavaScript / TypeScript
+  </p>
+</div>
+
+## 1. The 3-Step Journey
+
+<Steps>
+1. **Learn the Common Core — 3 mandatory blocks**
+
+   Frontend, Backend, and DevOps basics. Everything both career paths require 100%.
+
+2. **Stop at the Branching Point**
+
+   Assess your real situation: finances, product ideas, market opportunities, personal energy.
+
+3. **Choose Branch A or Branch B**
+
+   Go corporate (Branch A) or go independent (Branch B). You can switch branches later if circumstances change.
+</Steps>
+
+## 2. Common Core — 3 Mandatory Blocks
+
+Each block is not just a knowledge checklist — it's a **demonstrable capability** proven through real products.
+
+<div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+  <div class="modern-card accent-fe">
+    <h3>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+      Block 1: Master Frontend
+      <Badge text="3–6 months" variant="success" />
+    </h3>
+    <p>Interview-ready for Senior FE roles. Deep JS Core, Web fundamentals, React/Next.js, Testing, Performance, System Design.</p>
+    <details>
+      <summary>See tech stack details</summary>
+      <ul>
+        <li>JS Core Engine (V8, Event Loop, Memory Management)</li>
+        <li>JS Core Deep Dive (Prototype, this, Execution Context, Proxy, Class)</li>
+        <li>Advanced TypeScript (Generics, Utility Types, Zod Runtime Validation)</li>
+        <li>Build Tools &amp; Bundlers (Webpack, Vite, Rspack, Tree-shaking)</li>
+        <li>Package Managers (npm, yarn, pnpm, Lockfile, Peer Dependencies)</li>
+        <li>Design Patterns (Singleton, Observer, Factory, Compound, State Machine)</li>
+        <li>React Fiber, Re-render Optimization, React Compiler</li>
+        <li>Framework Evolution &amp; Next.js App Router (RSC, use(), Caching, Actions)</li>
+        <li>Error Handling &amp; Resilience, Form Engineering (react-hook-form)</li>
+        <li>TanStack Query, Zustand, XState</li>
+        <li>Tailwind Deep Dive, shadcn/ui, Modern CSS</li>
+        <li>Vitest, Playwright E2E, Core Web Vitals (LCP/INP/CLS)</li>
+        <li>Web Performance Optimization, Micro-frontends, Monorepo</li>
+        <li>Technical SEO, BFF Pattern, Frontend System Design (RADIO framework)</li>
+        <li>Frontend Security: XSS, CSP, CORS, Auth (OAuth/JWT)</li>
+        <li>AI Coding Agents daily: Claude Code / Cursor — always VERIFY output</li>
+      </ul>
+    </details>
+    <LinkCard title="Start Block 1 →" href="/en/block-1-master-frontend/goals-and-info/" />
+  </div>
+
+  <div class="modern-card accent-be">
+    <h3>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
+      Block 2: Master Backend
+      <Badge text="6–12 months" variant="note" />
+    </h3>
+    <p>Build solid APIs, integrate payment, search, email, background jobs and AI (LLM + RAG).</p>
+    <details>
+      <summary>See tech stack details</summary>
+      <ul>
+        <li>NestJS: DI, Guards, Interceptors, Pipes, Clean Architecture / DDD</li>
+        <li>SQL Fundamentals: ACID, Isolation Levels, Indexing</li>
+        <li>Prisma ORM: Schema, Migrations, Transactions, N+1 fixes</li>
+        <li>RESTful API standards, GraphQL / tRPC</li>
+        <li>Auth: JWT (Access/Refresh), OAuth2/OIDC, RBAC/ABAC</li>
+        <li>Security: OWASP Top 10, Rate Limiting, Argon2/Bcrypt</li>
+        <li>Webhooks, File Upload, Payment: Stripe</li>
+        <li>Search: Meilisearch / Elasticsearch, Transactional Email (Resend)</li>
+        <li>Background Jobs: BullMQ + Redis, Real-time: WebSockets (Socket.io)</li>
+        <li>API Design: Idempotency, Rate Limiting, Circuit Breaker, OpenAPI</li>
+        <li>Event-Driven: Outbox Pattern, Saga Pattern</li>
+        <li>LLM API Integration (Anthropic/OpenAI SDK), Basic RAG + pgvector</li>
+        <li>Backend System Design: rate limiter, webhook idempotency, job queues</li>
+      </ul>
+    </details>
+    <LinkCard title="Start Block 2 →" href="/en/block-2-master-backend/goals-and-info/" />
+  </div>
+
+  <div class="modern-card accent-ops">
+    <h3>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>
+      Block 3: DevOps Basics
+      <Badge text="2–3 months" variant="caution" />
+    </h3>
+    <p>Solo-deploy a complete project to production safely with automated CI/CD and observability.</p>
+    <details>
+      <summary>See tech stack details</summary>
+      <ul>
+        <li>Docker: Multi-stage build, docker-compose, networking, health checks</li>
+        <li>Linux VPS basics: Ubuntu/Debian, systemd, log rotation</li>
+        <li>CI/CD: GitHub Actions (Lint → Test → Build → Deploy, AI security scan)</li>
+        <li>Git Flow, Conventional Commits, Semantic Versioning</li>
+        <li>Domain &amp; DNS: Cloudflare (Proxy, SSL, DDoS protection)</li>
+        <li>Reverse Proxy: Nginx multi-service routing, load balancing</li>
+        <li>Deploy: Vercel (FE) + Railway/Render (BE)</li>
+        <li>Graceful Shutdown (SIGTERM), Automated DB backup (pg_dump cron)</li>
+        <li>Observability basics: Sentry + structured logging + OpenTelemetry</li>
+        <li>Secrets management (GitHub Secrets), Staging/Prod environment parity</li>
+      </ul>
+    </details>
+    <LinkCard title="Start Block 3 →" href="/en/block-3-devops-basics/goals-and-info/" />
+  </div>
+</div>
+
+## 3. The Branching Point — Decision Criteria
+
+Don't decide in advance based on gut feeling. When you reach the checkpoint (~month 9–12), evaluate:
+
+<table class="branch-table">
+  <thead>
+    <tr>
+      <th>Criteria</th>
+      <th>⬡ Branch A — Staff/Architect</th>
+      <th>⬡ Branch B — Solo Founder</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Finances</strong></td>
+      <td>No 6–12 month runway saved</td>
+      <td>Have savings to live 6–12 months without income</td>
+    </tr>
+    <tr>
+      <td><strong>Product</strong></td>
+      <td>No validated product idea</td>
+      <td>Have an idea with real user signals</td>
+    </tr>
+    <tr>
+      <td><strong>Job Market</strong></td>
+      <td>Received a good Senior/Fullstack offer</td>
+      <td>Market is tough, or offers aren't compelling</td>
+    </tr>
+    <tr>
+      <td><strong>Personal</strong></td>
+      <td>Need stable income for family</td>
+      <td>Few constraints, accept income volatility</td>
+    </tr>
+    <tr>
+      <td><strong>Energy</strong></td>
+      <td>Somewhat exhausted, need a stable pace</td>
+      <td>Still highly motivated to be fully independent</td>
+    </tr>
+  </tbody>
+</table>
+
+> This is not a permanent, one-way decision. You can take Branch A for a few years to build capital/experience, then switch to B — or vice versa.
+
+## 4. Journey After the Branch
+
+<Tabs>
+  <TabItem label="Branch A: Staff / Architect" icon="star">
+
+    Deep skills in System Design, Leadership, and clearing Senior/Staff interviews.
+
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginTop: '1.25rem' }}>
+      <div class="modern-card accent-info">
+        <h3>
+          A1: High Traffic System Design
+          <Badge text="6–12 months" variant="caution" />
+        </h3>
+        <p>Scalability, Caching Strategies, Sharding, Async &amp; Event-Driven, Microservices, Service Mesh, Distributed Transactions, IaC (Terraform/K8s), AI System Design.</p>
+      </div>
+      <div class="modern-card accent-info">
+        <h3>
+          A2: Career &amp; Interview
+          <Badge text="Parallel with A1" variant="note" />
+        </h3>
+        <p>DSA Patterns, System Design Interview format, Behavioral/STAR, Salary negotiation &amp; offer evaluation, Technical Writing (RFC/ADR), Tech Lead skills.</p>
+      </div>
+    </div>
+
+  </TabItem>
+
+  <TabItem label="Branch B: Solo Founder" icon="rocket">
+
+    Build real products, earn real revenue, operate like a business from day one.
+
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginTop: '1.25rem' }}>
+      <div class="modern-card accent-fe">
+        <h3>
+          B1: Validate Before You Build
+          <Badge text="1–2 months" variant="danger" />
+        </h3>
+        <p>Lean Startup, No-code demand tests, Real customer discovery interviews, define 1 narrow "core problem" before writing code.</p>
+      </div>
+      <div class="modern-card accent-be">
+        <h3>
+          B2: Minimal Deploy
+          <Badge text="Parallel with B3" variant="note" />
+        </h3>
+        <p>VPS + Docker Compose is enough for a very long time. Only learn Terraform/K8s when you actually hit limits — not pre-emptively.</p>
+      </div>
+      <div class="modern-card accent-ops">
+        <h3>
+          B3: Product, Growth &amp; Business
+          <Badge text="Ongoing" variant="success" />
+        </h3>
+        <p>AARRR Metrics, A/B Testing, Pricing strategy, Direct sales, Business registration, Financial Runway, Customer Support, Cofounder &amp; equity dynamics.</p>
+      </div>
+    </div>
+
+  </TabItem>
+</Tabs>
+
+## 5. Suggested Projects (Project-Based Learning)
+
+<CardGrid>
+  <div class="modern-card">
+    <h3>Portfolio + Blog</h3>
+    <p>Next.js App Router, Tailwind, MDX, SEO, Zod + Server Action, Lighthouse CI, Git flow.</p>
+  </div>
+  <div class="modern-card">
+    <h3>E-commerce Frontend</h3>
+    <p>TanStack Query, Zustand cart, Multi-step checkout (Zod + XState), Playwright E2E.</p>
+  </div>
+  <div class="modern-card">
+    <h3>SaaS API + AI Feature</h3>
+    <p>NestJS + Prisma + PostgreSQL, JWT, Stripe, BullMQ, LLM integration + RAG, Webhook security.</p>
+  </div>
+  <div class="modern-card">
+    <h3>Solo Deploy</h3>
+    <p>Docker Compose, GitHub Actions CI/CD, Nginx proxy, Cloudflare, Sentry, Backup automation.</p>
+  </div>
+</CardGrid>
+
+---
+
+<div class="callout-quote">
+  <h2>"Go deep, not shallow."</h2>
+  <p>
+    Every checkbox on the checklist is knowledge you must be able to <strong>explain to someone else</strong>.<br/>
+    If you can't explain it, you haven't learned it deeply enough — go back and study it again.
+  </p>
+</div>

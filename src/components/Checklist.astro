@@ -1,0 +1,38 @@
+---
+export interface Props {
+  items: string[];
+  storageKey: string;
+}
+
+const { items, storageKey } = Astro.props;
+---
+
+<ul class="checklist" data-key={storageKey}>
+  {items.map((item, i) => (
+    <li>
+      <label>
+        <input type="checkbox" data-index={i} />
+        <span>{item}</span>
+      </label>
+    </li>
+  ))}
+</ul>
+
+<script>
+  document.querySelectorAll('.checklist').forEach((list) => {
+    const key = list.getAttribute('data-key');
+    if (!key) return;
+
+    const saved = JSON.parse(localStorage.getItem(`check:${key}`) || '[]');
+
+    list.querySelectorAll('input').forEach((box, i) => {
+      box.checked = saved.includes(i);
+      box.addEventListener('change', () => {
+        const checked = Array.from(list.querySelectorAll('input'))
+          .map((b, idx) => (b as HTMLInputElement).checked ? idx : -1)
+          .filter((i) => i !== -1);
+        localStorage.setItem(`check:${key}`, JSON.stringify(checked));
+      });
+    });
+  });
+</script>

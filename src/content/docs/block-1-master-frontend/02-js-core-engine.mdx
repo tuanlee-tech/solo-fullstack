@@ -1,0 +1,112 @@
+---
+title: JS Core Engine
+description: Execution Context, this binding, Prototype chain, Proxy & Reflect, Class modern syntax.
+sidebar:
+  order: 2
+  label: JS Core Engine
+---
+
+import Checklist from '../../../components/Checklist.astro';
+
+# JS Core Engine
+
+> **Thời gian:** 4 buổi × 90 phút = 6 giờ  
+> **Output:** CodePen collection + Excalidraw diagram + Note Obsidian
+
+## Vấn đề
+
+Code JS đôi khi chạy không như bạn nghĩ. Tại sao `this` đổi giá trị? Tại sao `instanceof` đôi khi "lừa dối"? Tại sao class syntax là "syntactic sugar"? Senior phải debug được code JS legacy và giải thích cho junior hiểu.
+
+## Bảng quyết định
+
+| Khái niệm | Khi nào cần hiểu sâu | Khi nào KHÔNG cần |
+|-----------|---------------------|-------------------|
+| Execution Context | Luôn — để hiểu hoisting, scope, closure | Không bao giờ "không cần" |
+| `this` binding | Debug legacy code, interview, viết framework | Dùng arrow + Hooks thì ít gặp trực tiếp |
+| Prototype chain | Đọc code cũ (pre-ES6), hiểu `instanceof` | Code modern ít dùng trực tiếp |
+| Proxy | Validation, reactive state, logging — advanced | 90% app không cần tự viết Proxy |
+| Class modern (`#private`, `static`) | OOP trong TS/JS, design patterns | Functional programming purist |
+
+## Quyết định mặc định
+
+Hiểu Execution Context và `this` để debug. Hiểu Prototype để đọc legacy. Dùng Class modern khi cần OOP rõ ràng. Proxy chỉ khi cần intercept behavior.
+
+## Anti-pattern
+
+- Dùng `this` trong arrow function rồi ngạc nhiên khi nó không trỏ vào object.
+- Dùng `__proto__` thay vì `Object.getPrototypeOf()`.
+- Dùng `class` để "giống Java" trong khi JS không bắt buộc OOP.
+
+## Checklist chi tiết
+
+### Execution Context & Call Stack
+
+<Checklist 
+  storageKey="k1-js-core-execution"
+  items={[
+    "Global context vs Function context vs Eval context",
+    "Creation phase: hoisting (var vs let/const khác nhau)",
+    "Execution phase: scope chain lookup",
+    "Call Stack đọc được trong DevTools (debugger, breakpoint)"
+  ]} 
+/>
+
+### `this` Binding — 4 quy tắc
+
+<Checklist 
+  storageKey="k1-js-core-this"
+  items={[
+    "Implicit binding: obj.method() → this = obj",
+    "Explicit binding: call, apply, bind",
+    "new binding: new Func() → this = instance",
+    "Lexical binding (arrow function): inherit từ outer scope",
+    "Pitfall: setTimeout(obj.method, 0) mất this — fix bằng arrow hoặc bind",
+    "Pitfall: event listener this trỏ vào element — arrow function fix"
+  ]} 
+/>
+
+### Prototype Chain
+
+<Checklist 
+  storageKey="k1-js-core-prototype"
+  items={[
+    "prototype (property của constructor) vs __proto__ (internal slot của instance)",
+    "Object.create(proto) tạo object với prototype chỉ định",
+    "instanceof kiểm tra prototype chain, không phải 'class'",
+    "Class syntax là syntactic sugar trên prototype",
+    "Không extend built-in (Array, Object) trừ khi biết rõ rủi ro"
+  ]} 
+/>
+
+### Proxy & Reflect
+
+<Checklist 
+  storageKey="k1-js-core-proxy"
+  items={[
+    "new Proxy(target, handler) — intercept get, set, has, deleteProperty",
+    "Use case: validation, logging, reactive state cơ bản",
+    "Performance cost: Proxy chậm hơn object thường, không dùng hot path",
+    "Reflect API: thay thế Object.* một cách function-based"
+  ]} 
+/>
+
+### Class Modern Syntax
+
+<Checklist 
+  storageKey="k1-js-core-class"
+  items={[
+    "static method/property — thuộc về class, không phải instance",
+    "#private field — truly private, không truy cập từ ngoài class",
+    "Public field declaration — gán giá trị mặc định",
+    "Getter/Setter — get prop(), set prop(val)",
+    "So sánh với closure-based privacy (module pattern)"
+  ]} 
+/>
+
+## War Story: Debug `this` trong Legacy Code
+
+**Bối cảnh:** Codebase jQuery cũ có hàm `Widget.prototype.render = function() { ... }`. Khi refactor sang React Hooks, dev junior bọc hàm này trong arrow function → `this` undefined.
+
+**Quyết định:** Không dùng arrow function bọc method cũ. Giữ nguyên `bind` hoặc refactor hoàn toàn sang functional style.
+
+**Bài học:** `this` trong JS phụ thuộc vào cách gọi function, không phải nơi định nghĩa. Arrow function không có `this` riêng — đó là feature, không phải bug.
