@@ -5,10 +5,10 @@ import starlight from '@astrojs/starlight';
 // 1. SITE_URL  → set thủ công trong CF Pages → Production (custom domain hoặc pages.dev)
 // 2. CF_PAGES_URL → tự động inject bởi Cloudflare Pages → Preview deployments
 // 3. Fallback → localhost khi dev local
-const SITE_URL =
-  process.env.SITE_URL ??
-  process.env.CF_PAGES_URL ??
-  'http://localhost:4321';
+let SITE_URL = process.env.SITE_URL ?? process.env.CF_PAGES_URL ?? 'http://localhost:4321';
+if (!SITE_URL.startsWith('http')) {
+  SITE_URL = `https://${SITE_URL}`;
+}
 
 export default defineConfig({
   site: SITE_URL,
