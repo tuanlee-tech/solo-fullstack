@@ -25,7 +25,58 @@
   --sl-color-bg-sidebar: #f5f6f8;
   --sl-color-hairline: #c0c2c7;
   --sl-color-hairline-light: #eceef2;
+
+
+
+
+
+  /* --sl-text-2xs: 0.75rem; 12px */
+  /* --sl-text-xs: 0.8125rem; 13px */
+  /* --sl-text-sm: 0.875rem; 14px */
+  /* --sl-text-base: 1rem; 16px */
+  /* --sl-text-lg: 1.125rem; 18px */
+  /* --sl-text-xl: 1.25rem; 20px */
+  /* --sl-text-2xl: 1.5rem; 24px */
+  /* --sl-text-3xl: 1.8125rem; 29px */
+  /* --sl-text-4xl: 2.1875rem; 35px */
+  /* --sl-text-5xl: 2.625rem; 42px */
+  /* --sl-text-6xl: 4rem; 64px */
+
+
 }
+
+#_top {
+  font-size: var(--sl-text-3xl);
+}
+
+.link-title {
+  font-size: var(--sl-text-lg);
+}
+
+.sl-markdown-content h1:not(:where(.not-content *)) {
+  font-size: var(--sl-text-3xl);
+}
+
+.sl-markdown-content h2:not(:where(.not-content *)) {
+  font-size: var(--sl-text-2xl);
+}
+
+.sl-markdown-content h3:not(:where(.not-content *)) {
+  font-size: var(--sl-text-xl);
+}
+
+.sl-markdown-content h4:not(:where(.not-content *)) {
+  font-size: var(--sl-text-lg);
+}
+
+.sl-markdown-content h5:not(:where(.not-content *)) {
+  font-size: var(--sl-text-base);
+}
+
+.sl-markdown-content h6:not(:where(.not-content *)) {
+  font-size: var(--sl-text-sm);
+}
+
 
 :root[data-theme='dark'] {
   /* Dark Mode */
@@ -327,4 +378,15 @@ header.header {
 
 select {
   width: auto;
+}
+
+/* =========================================
+   Sidebar Styling Adjustments
+   ========================================= */
+.sidebar-pane details summary span.large {
+  font-size: var(--sl-text-base);
+}
+
+.sidebar-pane details details ul summary span.large {
+  font-size: var(--sl-text-sm);
 }

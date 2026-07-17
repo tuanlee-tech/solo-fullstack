@@ -3,253 +3,561 @@ title: Tổng quan Lộ trình Solo Fullstack
 description: Bản đồ toàn cảnh hành trình xây dựng nền tảng từ React đến Staff/Architect hoặc Solo Founder.
 ---
 
-import { Steps, Tabs, TabItem, CardGrid, LinkCard, Icon, Badge } from '@astrojs/starlight/components';
+import { Steps, Tabs, TabItem, CardGrid, LinkCard, Aside, Badge, Icon, FileTree } from '@astrojs/starlight/components';
 
-<div class="modern-card accent-info" style={{ marginBottom: '2rem' }}>
+<div class="modern-card accent-info">
   <h3>
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-    Định hướng chiến lược
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+    Tóm tắt
   </h3>
-  <p>
-    Xây nền tảng fullstack vững chắc, dùng chung cho 2 con đường sự nghiệp — <strong>đi làm lên Staff/Architect</strong> hoặc <strong>tự làm Solo Founder</strong> — rồi rẽ nhánh dựa trên hoàn cảnh thực tế, không chọn trước bằng cảm tính.
-    <br/><br/>
-    <strong>Nguyên tắc:</strong> Học theo chiều ngang (Project-based) · <strong>Thời gian lõi chung:</strong> 9–12 tháng · <strong>Hệ sinh thái:</strong> JavaScript / TypeScript
-  </p>
+  <p><strong>Mục tiêu:</strong> Xây nền tảng fullstack vững chắc, dùng chung cho 2 con đường — <strong>đi làm lên Staff/Architect</strong> hoặc <strong>tự làm Solo Founder</strong> — rồi rẽ nhánh dựa trên hoàn cảnh thực tế.</p>
+  <p><strong>Thời gian ước tính:</strong> Lõi chung 9–12 tháng (kịch bản lạc quan); thực tế cộng dồn 3 khối thường rơi vào <strong>11–21 tháng</strong> tùy tốc độ. Sau đó mỗi nhánh tiếp tục 12–24 tháng.</p>
+  <p><strong>Stack:</strong> JavaScript/TypeScript ecosystem</p>
+  <p><strong>Project liên quan:</strong> <Badge text="P1" variant="note" /> <Badge text="P2" variant="note" /> <Badge text="P3" variant="note" /> <Badge text="P4" variant="note" /> <Badge text="P5" variant="note" /> <Badge text="P6" variant="note" /></p>
 </div>
 
-## 1. Hành trình 3 Bước
+## 0. Vấn đề thực tế
+
+<Aside type="danger" title="Câu hỏi đau đầu của mid-level">
+  "Học fullstack để đi làm lên Staff, hay để tự kinh doanh? Và nếu chọn sai thì phải làm lại từ đầu?"
+</Aside>
+
+
+## 1. Tại sao tách lõi chung và rẽ nhánh
+
+Hai con đường cần kỹ năng khác nhau ở giai đoạn nâng cao:
+
+- <strong>Nhánh A (Staff/Architect):</strong> Kafka, service mesh, distributed systems
+- <strong>Nhánh B (Solo Founder):</strong> Sales, validate ý tưởng, unit economics
+
+Học cả hai cùng lúc kéo bạn về hai ưu tiên đối nghịch. Giải pháp:
 
 <Steps>
-1. **Học Lõi Chung — 3 khối bắt buộc**
-
-   Frontend, Backend, và DevOps cơ bản. Thứ cả hai con đường đều cần 100%.
-
-2. **Dừng lại ở Điểm Rẽ Nhánh**
-
-   Đánh giá hoàn cảnh thật lúc đó: tài chính, ý tưởng sản phẩm, cơ hội thị trường, năng lượng cá nhân.
-
-3. **Chọn Nhánh A hoặc Nhánh B**
-
-   Đi làm công ty (Nhánh A) hay tự kinh doanh (Nhánh B). Có thể đổi nhánh sau này nếu hoàn cảnh thay đổi.
+  <ol>
+    <li><strong>Học lõi chung trước</strong> — thứ cả hai con đường đều cần 100%</li>
+    <li><strong>Dừng lại ở điểm rẽ nhánh</strong> — đánh giá hoàn cảnh thật lúc đó</li>
+    <li><strong>Chọn Nhánh A hoặc B</strong> — có thể đổi nhánh sau này nếu hoàn cảnh thay đổi</li>
+  </ol>
 </Steps>
 
-## 2. Lõi Chung — 3 Khối Bắt Buộc
+## 2. Lõi chung — 3 khối bắt buộc
 
-Mỗi khối không chỉ là checklist kiến thức, mà là **năng lực chứng minh được** qua sản phẩm thật.
+Mỗi khối không chỉ là checklist kiến thức, mà là <strong>năng lực chứng minh được</strong>.
 
-<div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-  <div class="modern-card accent-fe">
-    <h3>
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
-      Khối 1: Master Frontend
-      <Badge text="3–6 tháng" variant="success" />
-    </h3>
-    <p>Sẵn sàng phỏng vấn Senior FE (30–45tr). Bao gồm JS Core sâu, Web thuần, React/Next.js, Testing, Performance, System Design.</p>
-    <details>
-      <summary>Xem chi tiết công nghệ</summary>
-      <ul>
-        <li>JS Core Engine (V8, Event Loop, Memory Management)</li>
-        <li>JS Core Deep Dive (Prototype, this, Execution Context, Proxy, Class)</li>
-        <li>TypeScript Nâng cao (Generics, Utility Types, Zod Runtime Validation)</li>
-        <li>Build Tool &amp; Bundler (Webpack, Vite, Rspack, Tree-shaking)</li>
-        <li>Package Manager (npm, yarn, pnpm, Lockfile, Peer Dependencies)</li>
-        <li>Design Patterns (Singleton, Observer, Factory, Compound, State Machine)</li>
-        <li>React Fiber, Re-render Optimization, React Compiler</li>
-        <li>Framework Evolution &amp; Next.js App Router (RSC, use(), Caching, Actions)</li>
-        <li>Error Handling &amp; Resilience, Form Engineering (react-hook-form)</li>
-        <li>TanStack Query, Zustand, XState</li>
-        <li>Tailwind Deep Dive, shadcn/ui, CSS Modern (@layer, Container Queries, :has())</li>
-        <li>Vitest + Testing Library, Playwright E2E, Core Web Vitals (LCP/INP/CLS)</li>
-        <li>Tối ưu Web Thuần (CRP, Font, Image, HTTP Caching), Micro-frontends, Monorepo</li>
-        <li>SEO Technical, BFF Pattern, Frontend System Design (RADIO framework)</li>
-        <li>Bảo mật Frontend: XSS, CSP, CORS, Auth (OAuth/JWT)</li>
-        <li>AI Coding Agent hằng ngày: Claude Code / Cursor — VERIFY output</li>
-      </ul>
-    </details>
-    <LinkCard title="Vào học Khối 1 →" href="/block-1-master-frontend/goals-and-info/" />
-  </div>
+### 2.1. Khối 1: Master Frontend
 
-  <div class="modern-card accent-be">
-    <h3>
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
-      Khối 2: Master Backend
-      <Badge text="6–12 tháng" variant="note" />
-    </h3>
-    <p>Tự build API vững chắc, tích hợp payment, search, email, background jobs và AI (LLM + RAG).</p>
-    <details>
-      <summary>Xem chi tiết công nghệ</summary>
-      <ul>
-        <li>NestJS: DI, Guards, Interceptors, Pipes, Clean Architecture / DDD</li>
-        <li>SQL Fundamentals: ACID, Isolation Levels, Indexing (B-Tree, Composite)</li>
-        <li>Prisma ORM: Schema, Migrations, Transactions, N+1 fix</li>
-        <li>RESTful API chuẩn, GraphQL / tRPC</li>
-        <li>Auth: JWT (Access/Refresh), OAuth2/OIDC, RBAC/ABAC</li>
-        <li>Security: OWASP Top 10, Rate Limiting, Argon2/Bcrypt</li>
-        <li>Webhooks (verify signature), File Upload, Payment: Stripe</li>
-        <li>Search: Meilisearch / Elasticsearch, Email Transactional (Resend)</li>
-        <li>Background Jobs: BullMQ + Redis, Real-time: WebSockets (Socket.io)</li>
-        <li>API Design: Idempotency, Rate Limiting, Circuit Breaker, OpenAPI</li>
-        <li>Event-Driven: Outbox Pattern, Saga Pattern</li>
-        <li>Tích hợp LLM API (Anthropic/OpenAI SDK), RAG cơ bản + pgvector</li>
-        <li>Backend System Design: rate limiter, webhook idempotency, job queue</li>
-      </ul>
-    </details>
-    <LinkCard title="Vào học Khối 2 →" href="/block-2-master-backend/goals-and-info/" />
-  </div>
-
-  <div class="modern-card accent-ops">
-    <h3>
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>
-      Khối 3: DevOps Cơ Bản
-      <Badge text="2–3 tháng" variant="caution" />
-    </h3>
-    <p>Solo deploy được 1 dự án hoàn chỉnh lên production an toàn với CI/CD tự động hóa và observability.</p>
-    <details>
-      <summary>Xem chi tiết công nghệ</summary>
-      <ul>
-        <li>Docker: Multi-stage build, docker-compose, networking, health checks</li>
-        <li>Linux VPS cơ bản: Ubuntu/Debian, systemd, log rotation</li>
-        <li>CI/CD: GitHub Actions (Lint → Test → Build → Deploy, AI security scan)</li>
-        <li>Git Flow, Conventional Commits, Semantic Versioning</li>
-        <li>Domain &amp; DNS: Cloudflare (Proxy, SSL, DDoS protection)</li>
-        <li>Reverse Proxy: Nginx routing multi-service, load balancing</li>
-        <li>Deploy: Vercel (FE) + Railway/Render (BE)</li>
-        <li>Graceful Shutdown (SIGTERM), Automated DB backup (pg_dump cron)</li>
-        <li>Observability cơ bản: Sentry + structured logging + OpenTelemetry basics</li>
-        <li>Secrets management (GitHub Secrets), Environment: Staging/Prod parity</li>
-      </ul>
-    </details>
-    <LinkCard title="Vào học Khối 3 →" href="/block-3-devops-basics/goals-and-info/" />
-  </div>
+<div class="modern-card accent-fe">
+  <h3>Frontend — Senior FE Ready</h3>
+  <p><strong>Thời gian:</strong> 3–6 tháng | <strong>Mục tiêu:</strong> Sẵn sàng phỏng vấn Senior FE (30–45 triệu)</p>
+  <p><em>Lưu ý: "sẵn sàng phỏng vấn", không phải "đã là senior".</em></p>
+  <ul>
+    <li>JS Core Engine (V8, Event Loop, Memory Management)</li>
+    <li>JS Core Deep Dive (Prototype, this, Execution Context, Proxy, Class)</li>
+    <li>TypeScript Nâng cao (Generics, Utility Types, Zod Runtime Validation)</li>
+    <li>Build Tool & Bundler (Webpack, Vite, Rspack, Tree-shaking)</li>
+    <li>Package Manager (npm, yarn, pnpm, Lockfile, Peer Dependencies)</li>
+    <li>Design Patterns (Singleton, Observer, Factory, Compound, State Machine)</li>
+    <li>React Fiber, Re-render Optimization, React Compiler (auto-memoization)</li>
+    <li>Framework Evolution (Class → Hooks → v19, Pages → App Router → v16)</li>
+    <li>Next.js App Router (RSC, Serialization Limits, use(), Caching, Actions)</li>
+    <li>Error Handling & Resilience (Boundary, Graceful Degradation, Retry)</li>
+    <li>Form Engineering (react-hook-form, Field Arrays, Optimistic, Auto-save)</li>
+    <li>TanStack Query, Zustand, Redux Ecosystem (RTK, Saga, RTK Query), XState</li>
+    <li>Tailwind Deep Dive, shadcn/ui, Component Library từ đầu</li>
+    <li>CSS Modern (@layer, Container Queries, :has(), Native Nesting)</li>
+    <li>Accessibility (WCAG 2.1 AA), Design System, Design Tokens</li>
+    <li>Vitest + Testing Library, Playwright E2E, MSW</li>
+    <li>Lighthouse CI, Core Web Vitals (LCP/INP/CLS), LoAF API, Performance Budget</li>
+    <li>Tối ưu Web Thuần (CRP, Font, Image, Video, HTTP Caching, DevTools)</li>
+    <li>Micro-frontends, Monorepo (Turborepo), PWA, i18n, Data Viz, Storybook</li>
+    <li>Web APIs & Storage (IndexedDB, Observers, Broadcast Channel, Page Vis)</li>
+    <li>SEO Technical: JSON-LD, GEO (AI Search Optimization), Dynamic Meta</li>
+    <li>BFF Pattern (Backend-for-Frontend, Next.js as BFF, Standalone BFF)</li>
+    <li>Frontend System Design: RADIO framework, News Feed/Autocomplete/Editor</li>
+    <li>Bảo mật Frontend: XSS, CSP, CORS, Auth (OAuth/JWT), Server Actions</li>
+    <li>Supply Chain Security (lockfile, Provenance, dependency confusion)</li>
+    <li>Production Ops: Error tracking, RUM, Feature Flags, Rollback, Incident</li>
+    <li>Git Teamwork (Rebase, Merge, Conflict, Cherry-pick, Reflog, Bisect)</li>
+    <li>AI Coding Agent hằng ngày: Claude Code / Cursor — VERIFY output AI</li>
+    <li>Judgment & Ownership: trade-off dưới ambiguity, code review, mentoring</li>
+    <li>War Stories: Deadline, API Dispute, Code Review, AI Output, Incident</li>
+  </ul>
 </div>
 
-## 3. Điểm Rẽ Nhánh — Tiêu Chí Quyết Định
+### 2.2. Khối 2: Master Backend & Ecosystem
 
-Không quyết định trước bằng cảm tính. Khi tới checkpoint (~tháng 9–12), đánh giá theo bảng:
+<div class="modern-card accent-be">
+  <h3>Backend — API vững chắc + AI</h3>
+  <p><strong>Thời gian:</strong> 6–12 tháng | <strong>Mục tiêu:</strong> Tự build API, tích hợp payment, search, email, AI</p>
+  <ul>
+    <li>NestJS: DI, Guards, Interceptors, Pipes, Clean Architecture / DDD</li>
+    <li>SQL Fundamentals: ACID, Isolation Levels, Indexing (B-Tree, Composite)</li>
+    <li>Prisma ORM: Schema, Migrations (strategy, rollback), Transactions, N+1</li>
+    <li>Database Design: Normalization, ER Modeling, Migration Strategy</li>
+    <li>NoSQL (MongoDB): Khi nào dùng Document thay Relational</li>
+    <li>RESTful API chuẩn: HTTP Status, Pagination, Filtering, Versioning</li>
+    <li>API Testing: Jest + Supertest, contract test</li>
+    <li>GraphQL / tRPC: Type-safe API, Apollo Server, tRPC + Next.js</li>
+    <li>Auth: JWT (Access/Refresh), OAuth2/OIDC, RBAC/ABAC, Session Management</li>
+    <li>Security: OWASP Top 10, XSS, CSRF, Rate Limiting, Argon2/Bcrypt</li>
+    <li>Webhooks: Verify signature, Retry with backoff, Idempotency keys</li>
+    <li>File Upload: Validation, virus scan, signed URL, CDN upload</li>
+    <li>Payment: Stripe (Checkout, Webhooks, Subscription, Idempotency)</li>
+    <li>Search: Elasticsearch / Meilisearch (Full-text search, typo-tolerant)</li>
+    <li>Email: Transactional (Resend/Postmark), Templates, Deliverability</li>
+    <li>Background Jobs: BullMQ + Redis (queue, schedule, retry, dead letter)</li>
+    <li>Real-time: WebSockets (Socket.io), Server-Sent Events (SSE)</li>
+    <li>API Design: Idempotency, Rate Limiting, Throttling, Circuit Breaker</li>
+    <li>OpenAPI / Swagger: Auto-generated docs, client SDK generation</li>
+    <li>Event-Driven: Outbox Pattern, Saga Pattern (distributed transactions)</li>
+    <li>Tích hợp LLM API (Anthropic/OpenAI SDK), streaming, prompt engineering</li>
+    <li>RAG cơ bản + Vector DB (pgvector trên Postgres, chưa cần Pinecone)</li>
+    <li>AI Evaluation: kiểm thử & đánh giá chất lượng output AI</li>
+    <li>Multi-tenancy: Schema-based vs Row-based (cơ bản)</li>
+    <li>Backend/API System Design: rate limiter, webhook idempotency, job queue chịu tải, notification system — luyện dạng bị hỏi ngược trade-off</li>
+  </ul>
+</div>
+
+### 2.3. Khối 3: DevOps cơ bản
+
+<div class="modern-card accent-ops">
+  <h3>DevOps — Solo deploy production</h3>
+  <p><strong>Thời gian:</strong> 2–3 tháng | <strong>Mục tiêu:</strong> Solo deploy 1 dự án hoàn chỉnh lên production</p>
+  <ul>
+    <li>Docker: Multi-stage build, docker-compose (Next + Nest + PG + Redis), networking, volumes, health checks</li>
+    <li>Linux VPS cơ bản: Ubuntu/Debian, permissions, systemd, log rotation</li>
+    <li>CI/CD: GitHub Actions (Lint → Test → Build → Push → Deploy), AI-assisted security scanning</li>
+    <li>Git Flow / Trunk Based, Conventional Commits, Semantic Versioning</li>
+    <li>Domain & DNS: Cloudflare (Proxy, DNS, Free SSL, DDoS protection)</li>
+    <li>Reverse Proxy: Nginx routing multi-service, caching, load balancing</li>
+    <li>SSL/TLS: Let's Encrypt auto-renewal, Cloudflare Origin CA</li>
+    <li>Environment Management: Staging/Prod parity, .env best practices, Secrets management</li>
+    <li>Deploy: Vercel (FE) + Railway/Render (BE) — chưa cần AWS phức tạp</li>
+    <li>Graceful Shutdown: SIGTERM handling, connection draining</li>
+    <li>Backup cơ bản: Automated DB backup (pg_dump cron), test restore thật</li>
+    <li>Observability cơ bản: Sentry + structured logging + OpenTelemetry basics</li>
+    <li>Khung Production Readiness: bảo mật nền + observability nối thẳng runbook + rollback tập luyện thật + backup test restore thật</li>
+  </ul>
+  <p><em>Lưu ý: Terraform, Vault, K8s, Service Mesh, IaC nâng cao chuyển sang Nhánh A.</em></p>
+</div>
+
+## 3. Điểm rẽ nhánh — Tiêu chí quyết định
+
+Không quyết định trước bằng cảm tính. Khi tới checkpoint (~tháng 9–12), đánh giá theo bảng sau:
 
 <table class="branch-table">
   <thead>
     <tr>
       <th>Tiêu chí</th>
-      <th>⬡ Nhánh A — Staff/Architect</th>
-      <th>⬡ Nhánh B — Solo Founder</th>
+      <th>Nghiêng về Nhánh A (Staff/Architect)</th>
+      <th>Nghiêng về Nhánh B (Solo Founder)</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <td><strong>Tài chính</strong></td>
-      <td>Chưa có runway 6–12 tháng</td>
+      <td>Chưa có runway 6–12 tháng chi phí sống</td>
       <td>Đã có tiết kiệm đủ sống 6–12 tháng không lương</td>
     </tr>
     <tr>
-      <td><strong>Sản phẩm</strong></td>
-      <td>Chưa có ý tưởng đã kiểm chứng</td>
-      <td>Đã có ý tưởng + tín hiệu người dùng thật</td>
+      <td><strong>Ý tưởng sản phẩm</strong></td>
+      <td>Chưa có ý tưởng đã kiểm chứng nhu cầu thật</td>
+      <td>Đã có ý tưởng + tín hiệu người dùng thật (dù nhỏ)</td>
     </tr>
     <tr>
-      <td><strong>Tìm việc</strong></td>
+      <td><strong>Kết quả tìm việc</strong></td>
       <td>Nhận được offer Senior/Fullstack tốt</td>
-      <td>Thị trường khó, hoặc offer không hấp dẫn</td>
+      <td>Thị trường tuyển dụng khó, hoặc offer không hấp dẫn</td>
     </tr>
     <tr>
-      <td><strong>Cá nhân</strong></td>
-      <td>Cần thu nhập ổn định</td>
+      <td><strong>Ràng buộc cá nhân</strong></td>
+      <td>Có gia đình cần thu nhập ổn định</td>
       <td>Ít ràng buộc, chấp nhận rủi ro thu nhập bấp bênh</td>
     </tr>
     <tr>
-      <td><strong>Năng lượng</strong></td>
-      <td>Đã khá kiệt sức, cần nhịp ổn định</td>
+      <td><strong>Năng lượng sau 9–12 tháng</strong></td>
+      <td>Đã khá kiệt sức, cần nhịp ổn định hơn</td>
       <td>Vẫn còn động lực cao để tự chủ hoàn toàn</td>
     </tr>
   </tbody>
 </table>
 
-> Đây không phải quyết định vĩnh viễn. Có thể đi Nhánh A vài năm để tích lũy vốn/kinh nghiệm rồi mới rẽ sang B — hoặc ngược lại.
+<Aside type="tip" title="Không phải quyết định vĩnh viễn">
+  Có thể đi Nhánh A vài năm để tích lũy vốn/kinh nghiệm/quan hệ rồi mới rẽ sang B — hoặc ngược lại, thử Nhánh B một thời gian rồi quay lại đi làm nếu hoàn cảnh đổi.
+</Aside>
 
-## 4. Hành Trình Sau Rẽ Nhánh
+## 4. Nhánh A: Staff/Architect
 
-<Tabs>
-  <TabItem label="Nhánh A: Staff / Architect" icon="star">
+<div class="dense-grid">
+  <div class="modern-card accent-be">
+    <h3>A1: High Traffic System Design</h3>
+    <p><strong>Thời gian:</strong> 6–12 tháng | <strong>Mục tiêu:</strong> Staff/Principal level — thiết kế hệ thống chịu tải cao</p>
+    <ul>
+      <li>Scalability: Horizontal vs Vertical, Load Balancing (L7/L4), Auto-scale</li>
+      <li>Caching Strategies: Cache Aside, Read-Through, Write-Behind, Invalidation</li>
+      <li>Database Advanced: Sharding, Partitioning, Read Replicas, Connection Pooling, CAP/PACELC theorem</li>
+      <li>Async & Event-Driven: Kafka/RabbitMQ, Event Sourcing, CQRS</li>
+      <li>Microservices: Khi nào tách, khi nào không, API Gateway (Kong/AWS)</li>
+      <li>Service Mesh: Istio/Linkerd (m2m communication, observability)</li>
+      <li>Distributed Transactions: Saga Pattern, 2PC, Outbox Pattern</li>
+      <li>CDN & Edge: Cloudflare Workers, Edge computing, Global load balancing</li>
+      <li>Chaos Engineering: Circuit breakers (Resilience4j), Fault injection</li>
+      <li>Security Advanced: mTLS, WAF, DDOS mitigation, Zero Trust</li>
+      <li>Compliance: GDPR/CCPA, Data retention, Right to be forgotten</li>
+      <li>Infrastructure as Code: Terraform / Pulumi, K8s, HashiCorp Vault / Secrets Manager</li>
+      <li>AI System Design: kiến trúc có AI là thành phần cốt lõi, multi-model routing, real-time inference, vector DB như lớp dữ liệu ngang hàng</li>
+      <li>Bài tập: URL Shortener, Twitter/X News Feed, Chat System, E-commerce Checkout (Saga), Video Streaming</li>
+    </ul>
+  </div>
+  <div class="modern-card accent-fe">
+    <h3>A2: Career & Interview</h3>
+    <p><strong>Thời gian:</strong> Song song với A1 | <strong>Mục tiêu:</strong> Vượt qua phỏng vấn Senior/Staff và tối ưu thu nhập</p>
+    <ul>
+      <li>Data Structures & Algorithms (pattern thường gặp, không cần thi đấu)</li>
+      <li>System Design Interview format: trình bày trong 45 phút — kỹ năng giao tiếp/framing riêng</li>
+      <li>Frontend System Design: RADIO framework, UI Component + Application</li>
+      <li>Behavioral Interview: War Stories, STAR format, trade-off reasoning</li>
+      <li>Đàm phán lương & đánh giá offer (base, equity, benefit, level)</li>
+      <li>Technical Writing: RFC/ADR, tài liệu kiến trúc</li>
+      <li>Tech Lead: Tech Debt Management, Code Review Culture, mentoring</li>
+      <li>Cross-team influence, xây ảnh hưởng kỹ thuật không cần chức danh</li>
+    </ul>
+  </div>
+</div>
 
-    Phát triển kỹ năng sâu về System Design, Leadership và vượt qua phỏng vấn Senior/Staff.
+## 5. Nhánh B: Solo Founder
 
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginTop: '1.25rem' }}>
-      <div class="modern-card accent-info">
-        <h3>
-          A1: High Traffic System Design
-          <Badge text="6–12 tháng" variant="caution" />
-        </h3>
-        <p>Scalability, Caching Strategies, Sharding, Async &amp; Event-Driven, Microservices, Service Mesh, Distributed Transactions, IaC (Terraform/K8s), AI System Design (multi-model routing, vector DB).</p>
-      </div>
-      <div class="modern-card accent-info">
-        <h3>
-          A2: Career &amp; Interview
-          <Badge text="Song song A1" variant="note" />
-        </h3>
-        <p>DSA Patterns, System Design Interview format, Behavioral/STAR, Đàm phán lương &amp; đánh giá offer, Technical Writing (RFC/ADR), Tech Lead skills, cross-team influence.</p>
-      </div>
-    </div>
+<Steps>
+  <ol>
+    <li>
+      <strong>B1: Validate trước khi build</strong> (1–2 tháng)
+      <ul>
+        <li>Lean Startup, MVP Validation</li>
+        <li>No-code test nhu cầu trước khi code (landing page, form đăng ký chờ)</li>
+        <li>Customer discovery: user interview thật, không hỏi ý kiến chung chung</li>
+        <li>Xác định 1 "core problem" hẹp thay vì sản phẩm đa năng ngay từ đầu</li>
+      </ul>
+    </li>
+    <li>
+      <strong>B2: Deploy tối giản</strong> (song song B3)
+      <ul>
+        <li>VPS đơn giản + Docker Compose là đủ cho rất lâu (không cần K8s)</li>
+        <li>Feature Flags cơ bản nếu cần (Unleash open-source)</li>
+        <li>Staging environment đơn giản</li>
+        <li>Chỉ học Terraform/Vault/Service Mesh/Kafka khi THẬT SỰ chạm giới hạn của Docker Compose + 1 VPS</li>
+      </ul>
+    </li>
+    <li>
+      <strong>B3: Product, Growth & Business</strong> (liên tục)
+      <ul>
+        <li>Metrics: AARRR, North Star Metric, CAC/LTV, Unit Economics</li>
+        <li>Analytics: PostHog/Amplitude, SQL for product analytics</li>
+        <li>UX Research: A/B Testing (statistical significance)</li>
+        <li>Pricing: Freemium, Tiered, Usage-based, Stripe/Paddle integration</li>
+        <li>Growth: SEO, Content marketing, Viral loops, Referral programs</li>
+        <li>Sales trực tiếp: cold outreach, demo, closing — quan trọng hơn kỹ thuật ở giai đoạn đầu</li>
+        <li>Đăng ký kinh doanh: hộ kinh doanh cá thể / công ty TNHH tại Việt Nam</li>
+        <li>Cofounder & equity dynamics (nếu có): vesting, cap table cơ bản</li>
+        <li>Legal: Terms of Service, Privacy Policy, GDPR, Software licenses</li>
+        <li>Financial: Burn rate, Runway, Fundraising basics (Seed, Series A)</li>
+        <li>Customer Support: Intercom/Crisp, SLA, Ticketing system</li>
+        <li>Hiring & Team Building: khi có traction thật, cần scale team</li>
+        <li>Tech Lead skills: RFC/ADR, Tech Debt — vẫn cần dù đang solo</li>
+      </ul>
+    </li>
+  </ol>
+</Steps>
 
+## 6. Nguyên tắc học theo chiều ngang (Project-based)
+
+<Aside type="caution" title="Không học: HTML form → CSS → JS → React → Node → DB">
+  Học đúng: HTML form → Zod validate FE → NestJS nhận data → Prisma lưu DB → Playwright test flow.
+  <p class="mt-sm"><strong>Kết quả:</strong> 1 Project nhỏ hoàn chỉnh, có thể demo, có thể đưa vào portfolio.</p>
+</Aside>
+
+### Project đề xuất theo giai đoạn
+
+<table>
+  <thead>
+    <tr>
+      <th>Giai đoạn</th>
+      <th>Project</th>
+      <th>Kiến thức lồng ghép</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Lõi chung</td>
+      <td><strong>Portfolio + Blog</strong></td>
+      <td>Next.js App Router, Tailwind, shadcn/ui, MDX, SEO, Zod + Server Action, Lighthouse CI, Git flow</td>
+    </tr>
+    <tr>
+      <td>Lõi chung</td>
+      <td><strong>E-commerce Frontend</strong></td>
+      <td>TanStack Query, Zustand cart, Multi-step checkout (Zod + XState), PWA, Playwright E2E, Git cherry-pick</td>
+    </tr>
+    <tr>
+      <td>Lõi chung</td>
+      <td><strong>SaaS API Backend + AI feature</strong></td>
+      <td>NestJS + Prisma + PostgreSQL, JWT Auth, Stripe payment, BullMQ email queue, LLM API + RAG cơ bản, API testing, Webhook security</td>
+    </tr>
+    <tr>
+      <td>Lõi chung</td>
+      <td><strong>Solo Deploy</strong></td>
+      <td>Docker compose, GitHub Actions CI/CD, Nginx reverse proxy, Cloudflare, Sentry, Backup automation, Graceful shutdown</td>
+    </tr>
+    <tr>
+      <td>Nhánh A</td>
+      <td><strong>URL Shortener</strong></td>
+      <td>Caching (Redis), Rate limiting, Horizontal scaling, Load balancing, API versioning</td>
+    </tr>
+    <tr>
+      <td>Nhánh A</td>
+      <td><strong>Twitter/X Clone</strong></td>
+      <td>News feed (fan-out write vs read), Notification system, Search, Microservices, Event-driven (Outbox, Saga)</td>
+    </tr>
+    <tr>
+      <td>Nhánh B</td>
+      <td><strong>MVP thật có user</strong></td>
+      <td>Xuất phát từ B1 (đã validate), launch nhanh, đo AARRR, thu phí sớm</td>
+    </tr>
+    <tr>
+      <td>Nhánh B</td>
+      <td><strong>Real-time Chat</strong></td>
+      <td>WebSockets, Redis pub/sub — chỉ làm nếu MVP thật sự cần</td>
+    </tr>
+  </tbody>
+</table>
+
+## 7. Stack đề xuất (2026)
+
+<Aside type="tip" title="Nguyên tắc stack">
+  Dùng SaaS cho non-core, tự build cho core business. Không reinvent the wheel.
+</Aside>
+
+| Layer | Công nghệ | Ghi chú |
+|---|---|---|
+| **Frontend** | Next.js 14+ (App Router) + Tailwind + shadcn/ui | RSC, SEO built-in, Vercel deploy |
+| **State FE** | TanStack Query + Zustand | Server state + Client state separation |
+| **Backend** | Next.js API Routes (bắt đầu) → NestJS (scale) | Cùng JS/TS ecosystem, chuyển dễ dàng |
+| **Database** | PostgreSQL (Neon / Supabase / RDS) | Relational, ACID, Prisma hỗ trợ tốt |
+| **AI / LLM** | Anthropic/OpenAI API + pgvector | RAG cơ bản trên chính Postgres |
+| **AI Coding Tool** | Claude Code / Cursor / Copilot agent mode | Công cụ hằng ngày, VERIFY output |
+| **Cache** | Redis (Upstash / Railway / self-host) | Session, rate limit, BullMQ, cache layer |
+| **Auth** | Clerk / NextAuth.js / Supabase Auth | Không tự build auth cho startup sớm |
+| **Payment** | Stripe | Checkout, Subscription, Webhooks, Idempotency |
+| **Search** | Meilisearch → Elasticsearch (scale, Nhánh A) | Full-text search, typo-tolerant |
+| **File Storage** | AWS S3 / Cloudflare R2 | Ảnh, video, documents |
+| **Email** | Resend / Postmark | Transactional email, templates |
+| **Monitoring** | Sentry + OpenTelemetry basics | FE + BE errors, structured logging, tracing |
+| **Analytics** | PostHog / Plausible | Product analytics, funnel, retention |
+| **Deploy** | Vercel (FE) → Railway/Render (BE) → AWS/K8s (Nhánh A scale) | Tiến hóa theo traffic |
+| **CI/CD** | GitHub Actions | Lint, Test, Build, Deploy tự động, AI security scan |
+| **Domain** | Cloudflare | DNS, SSL, CDN, DDoS protection |
+| **Git** | pnpm + GitHub | Workspace, lockfile, branch protection, semantic release |
+
+## 8. Lộ trình thực tế — Kết hợp đi làm & học
+
+<Tabs syncKey="timeline">
+  <TabItem label="Tháng 1–3">
+    <p><strong>KHỐI 1: Master FE</strong></p>
+    <ul>
+      <li>Học sâu, làm 2 project portfolio, dùng AI coding agent hằng ngày ngay từ đầu</li>
+      <li>Bao gồm: JS Core, Build Tool, Package Manager, Git Teamwork, Framework Evolution, Error Handling, Form Engineering, CSS Modern, Web Thuần, Web APIs, BFF, War Stories, System Design practice</li>
+      <li>Đủ nền tảng để <strong>BẮT ĐẦU phỏng vấn Senior FE (30–45 triệu)</strong> — không phải "là senior", mà là đủ điều kiện để được nhận và tích lũy kinh nghiệm senior thật qua công việc</li>
+    </ul>
   </TabItem>
-
-  <TabItem label="Nhánh B: Solo Founder" icon="rocket">
-
-    Xây sản phẩm thật, có doanh thu thật, vận hành như một business từ ngày đầu.
-
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginTop: '1.25rem' }}>
-      <div class="modern-card accent-fe">
-        <h3>
-          B1: Validate Trước Khi Build
-          <Badge text="1–2 tháng" variant="danger" />
-        </h3>
-        <p>Lean Startup, No-code test nhu cầu, Customer discovery interview thật, xác định 1 "core problem" hẹp trước khi viết code.</p>
-      </div>
+  <TabItem label="Tháng 4–9">
+    <p><strong>KHỐI 2: Master BE + AI integration</strong></p>
+    <ul>
+      <li>NestJS, DB, Payment, Search, tích hợp LLM API vào 1 project thật</li>
+      <li>Bao gồm: API Testing, Migration Strategy, Webhook Security, Idempotency, Rate Limiting, OpenAPI, Event-driven patterns</li>
+      <li>Đi làm FE Senior, học BE song song</li>
+    </ul>
+  </TabItem>
+  <TabItem label="Tháng 9–12">
+    <p><strong>KHỐI 3: DevOps cơ bản</strong></p>
+    <ul>
+      <li>Docker, CI/CD, deploy 1 sản phẩm hoàn chỉnh lên production</li>
+      <li>Bao gồm: Docker networking, Health checks, Graceful shutdown, Log rotation, Backup automation, SSL auto-renewal, Environment mgmt</li>
+      <li>Đủ nền tảng kỹ thuật để tự vận hành 1 sản phẩm fullstack — kinh nghiệm "fullstack thật" vẫn cần tích lũy tiếp qua thực chiến</li>
+    </ul>
+  </TabItem>
+  <TabItem label="Tháng 13+">
+    <p><strong>ĐIỂM RẼ NHÁNH</strong> — đánh giá theo bảng tiêu chí mục 3</p>
+    <div class="dense-grid">
       <div class="modern-card accent-be">
-        <h3>
-          B2: Deploy Tối Giản
-          <Badge text="Song song B3" variant="note" />
-        </h3>
-        <p>VPS đơn giản + Docker Compose là đủ rất lâu. Chỉ học Terraform/K8s khi thật sự chạm giới hạn — không học trước "phòng khi cần".</p>
+        <h4>Nhánh A</h4>
+        <p>A1 (System Design nâng cao, 6–12 tháng) + A2 (Interview & Career, song song)</p>
+        <p>Apply Senior/Staff tại công ty mục tiêu</p>
       </div>
       <div class="modern-card accent-ops">
-        <h3>
-          B3: Product, Growth &amp; Business
-          <Badge text="Liên tục" variant="success" />
-        </h3>
-        <p>AARRR Metrics, A/B Testing, Pricing strategy, Sales trực tiếp, Đăng ký kinh doanh VN, Financial Runway, Customer Support, Cofounder &amp; equity.</p>
+        <h4>Nhánh B</h4>
+        <p>B1 (Validate, 1–2 tháng) → B2 (Deploy tối giản) → B3 (Product/Growth/Business)</p>
+        <p>Launch MVP có user thật, thu phí sớm, iterate theo data</p>
       </div>
     </div>
-
   </TabItem>
 </Tabs>
 
-## 5. Dự Án Đề Xuất (Project-Based)
+## 9. Các điểm cốt lõi từ JD thực tế
 
-<CardGrid>
-  <div class="modern-card">
-    <h3>Portfolio + Blog</h3>
-    <p>Next.js App Router, Tailwind, MDX, SEO, Zod + Server Action, Lighthouse CI, Git flow.</p>
-  </div>
-  <div class="modern-card">
-    <h3>E-commerce Frontend</h3>
-    <p>TanStack Query, Zustand cart, Multi-step checkout (Zod + XState), Playwright E2E.</p>
-  </div>
-  <div class="modern-card">
-    <h3>SaaS API + AI Feature</h3>
-    <p>NestJS + Prisma + PostgreSQL, JWT, Stripe, BullMQ, Tích hợp LLM + RAG, Webhook security.</p>
-  </div>
-  <div class="modern-card">
-    <h3>Solo Deploy</h3>
-    <p>Docker Compose, GitHub Actions CI/CD, Nginx proxy, Cloudflare, Sentry, Backup automation.</p>
-  </div>
-</CardGrid>
+<table>
+  <thead>
+    <tr>
+      <th>Yêu cầu JD</th>
+      <th>Thuộc khối/nhánh</th>
+      <th>Mức độ</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td>jQuery → React migration</td><td>Khối 1 (Lõi chung)</td><td><Badge text="Critical" variant="danger" /></td></tr>
+    <tr><td>JS Core (Prototype, this, Execution Context)</td><td>Khối 1 (Lõi chung)</td><td><Badge text="Critical" variant="danger" /></td></tr>
+    <tr><td>Build Tool (Webpack/Vite)</td><td>Khối 1 (Lõi chung)</td><td><Badge text="High" variant="caution" /></td></tr>
+    <tr><td>Package Manager (pnpm, lockfile)</td><td>Khối 1 (Lõi chung)</td><td><Badge text="High" variant="caution" /></td></tr>
+    <tr><td>Git Teamwork (rebase, conflict, cherry-pick)</td><td>Khối 1 (Lõi chung)</td><td><Badge text="High" variant="caution" /></td></tr>
+    <tr><td>CSS Modern (@layer, container queries)</td><td>Khối 1 (Lõi chung)</td><td><Badge text="Medium" variant="note" /></td></tr>
+    <tr><td>Error Handling & Resilience</td><td>Khối 1 (Lõi chung)</td><td><Badge text="High" variant="caution" /></td></tr>
+    <tr><td>Form Engineering (complex forms)</td><td>Khối 1 (Lõi chung)</td><td><Badge text="High" variant="caution" /></td></tr>
+    <tr><td>BFF Pattern</td><td>Khối 1 (Lõi chung)</td><td><Badge text="Medium" variant="note" /></td></tr>
+    <tr><td>Web APIs (IndexedDB, Observers)</td><td>Khối 1 (Lõi chung)</td><td><Badge text="Medium" variant="note" /></td></tr>
+    <tr><td>Tối ưu Web Thuần (CRP, HTTP caching)</td><td>Khối 1 (Lõi chung)</td><td><Badge text="High" variant="caution" /></td></tr>
+    <tr><td>Micro-frontends (Module Federation)</td><td>Khối 1 (Lõi chung)</td><td><Badge text="High" variant="caution" /></td></tr>
+    <tr><td>Monorepo (Nx, Turborepo)</td><td>Khối 1 (Lõi chung)</td><td><Badge text="High" variant="caution" /></td></tr>
+    <tr><td>PWA / Tablet-optimized</td><td>Khối 1 (Lõi chung)</td><td><Badge text="Medium" variant="note" /></td></tr>
+    <tr><td>i18n (react-i18next)</td><td>Khối 1 (Lõi chung)</td><td><Badge text="High" variant="caution" /></td></tr>
+    <tr><td>WCAG / Accessibility</td><td>Khối 1 (Lõi chung)</td><td><Badge text="High" variant="caution" /></td></tr>
+    <tr><td>Storybook + Chromatic</td><td>Khối 1 (Lõi chung)</td><td><Badge text="Medium" variant="note" /></td></tr>
+    <tr><td>Frontend System Design (RADIO)</td><td>Khối 1 → A2</td><td><Badge text="Critical" variant="danger" /></td></tr>
+    <tr><td>War Stories / Behavioral</td><td>Khối 1 → A2</td><td><Badge text="Critical" variant="danger" /></td></tr>
+    <tr><td>API Testing (Jest/Supertest)</td><td>Khối 2 (Lõi chung)</td><td><Badge text="High" variant="caution" /></td></tr>
+    <tr><td>API Versioning</td><td>Khối 2 (Lõi chung)</td><td><Badge text="Medium" variant="note" /></td></tr>
+    <tr><td>Rate Limiting / Idempotency</td><td>Khối 2 (Lõi chung)</td><td><Badge text="High" variant="caution" /></td></tr>
+    <tr><td>Webhook Security (signature)</td><td>Khối 2 (Lõi chung)</td><td><Badge text="High" variant="caution" /></td></tr>
+    <tr><td>OpenAPI / Swagger</td><td>Khối 2 (Lõi chung)</td><td><Badge text="Medium" variant="note" /></td></tr>
+    <tr><td>Event-driven (Outbox, Saga)</td><td>Khối 2 → A1</td><td><Badge text="High" variant="caution" /></td></tr>
+    <tr><td>Multi-tenancy</td><td>Khối 2 (Lõi chung)</td><td><Badge text="Medium" variant="note" /></td></tr>
+    <tr><td>AI integration / LLM API</td><td>Khối 2 (Lõi chung)</td><td><Badge text="High" variant="caution" /></td></tr>
+    <tr><td>eCommerce + SEO/GEO</td><td>Khối 1 (Lõi chung)</td><td><Badge text="High" variant="caution" /></td></tr>
+    <tr><td>GraphQL</td><td>Khối 2 (Lõi chung)</td><td><Badge text="Medium" variant="note" /></td></tr>
+    <tr><td>Elasticsearch</td><td>Khối 2 → A1</td><td><Badge text="Medium" variant="note" /></td></tr>
+    <tr><td>Design Patterns + OOP</td><td>Khối 1–2 (Lõi chung)</td><td><Badge text="High" variant="caution" /></td></tr>
+    <tr><td>System Design + Performance</td><td>A1 (Nhánh A)</td><td><Badge text="High" variant="caution" /></td></tr>
+    <tr><td>DSA / Coding Interview</td><td>A2 (Nhánh A)</td><td><Badge text="High" variant="caution" /></td></tr>
+    <tr><td>MVP Validation / Customer Discovery</td><td>B1 (Nhánh B)</td><td><Badge text="Critical" variant="danger" /></td></tr>
+  </tbody>
+</table>
+
+## 10. Cam kết & kỷ luật
+
+<Steps>
+  <ol>
+    <li><strong>Học mỗi ngày ít nhất 2 giờ</strong> — sáng 1h trước khi đi làm, tối 1h sau khi về</li>
+    <li><strong>Cuối tuần làm project</strong> — 4–8 giờ, đóng gói kiến thức tuần đó thành code</li>
+    <li><strong>Không xem tutorial passive</strong> — Pause, code theo, sau đó tự làm lại không nhìn</li>
+    <li><strong>Mỗi tháng 1 project nhỏ</strong> — Hoàn chỉnh, deploy, share lên GitHub</li>
+    <li><strong>Tham gia cộng đồng</strong> — Discord/Reddit dev communities, contribute open source</li>
+    <li><strong>Checkpoint 3 tháng/lần</strong> — Đánh giá lại tiến độ và hoàn cảnh, điều chỉnh kế hoạch</li>
+    <li><strong>Giữ nhịp bền vững, không burnout</strong> — "2 giờ/ngày đều đặn trong 12 tháng" tốt hơn "6 giờ/ngày trong 2 tháng rồi bỏ cuộc"</li>
+    <li><strong>Nhánh A:</strong> Technical blog post định kỳ — củng cố kiến thức + xây thương hiệu cá nhân</li>
+    <li><strong>Nhánh B:</strong> "Build in Public" — chia sẻ journey, nhận feedback, tạo accountability</li>
+  </ol>
+</Steps>
+
+<Aside type="danger" title="Burnout là yếu tố thất bại lớn nhất">
+  Dữ liệu khảo sát solo founder gần đây cho thấy <strong>burnout (không phải chiến lược sai)</strong> là yếu tố dự báo thất bại lớn nhất. Nếu cảm thấy kiệt sức liên tục, đó là tín hiệu để <strong>giảm nhịp</strong>, không phải để cố ép thêm.
+</Aside>
+
+## 11. Tài liệu tham khảo chính
+
+<Tabs syncKey="refs">
+  <TabItem label="Chung">
+    <ul>
+      <li><strong>JavaScript:</strong> "You Don't Know JS" (Kyle Simpson), "JavaScript: The Definitive Guide"</li>
+      <li><strong>TypeScript:</strong> "Effective TypeScript" (Dan Vanderkam), TypeScript Handbook</li>
+      <li><strong>React:</strong> React Docs (Beta), "Building Large-Scale Web Apps" (Addy Osmani)</li>
+      <li><strong>Next.js:</strong> Next.js Documentation (App Router), Vercel Engineering Blog</li>
+      <li><strong>Backend:</strong> NestJS Docs, "Node.js Design Patterns" (Mario Casciaro)</li>
+      <li><strong>DevOps:</strong> "The Docker Book", GitHub Actions docs, Nginx docs</li>
+      <li><strong>AI Engineering:</strong> Anthropic Docs (docs.claude.com), Claude Code / MCP docs</li>
+      <li><strong>Frontend System Design:</strong> Frontend Interview Handbook</li>
+      <li><strong>Web Performance:</strong> web.dev (Core Web Vitals, LoAF, CRP)</li>
+      <li><strong>Security:</strong> OWASP Top 10, OWASP Cheat Sheet Series</li>
+    </ul>
+  </TabItem>
+  <TabItem label="Nhánh A">
+    <ul>
+      <li><strong>System Design:</strong> "Designing Data-Intensive Applications" (Martin Kleppmann) — <strong>BIBLE</strong></li>
+      <li><strong>Interview:</strong> DSA pattern (không cần thi đấu), system design phỏng vấn format</li>
+      <li><strong>DevOps:</strong> "Kubernetes in Action" (khi cần)</li>
+    </ul>
+  </TabItem>
+  <TabItem label="Nhánh B">
+    <ul>
+      <li><strong>Product:</strong> "The Lean Startup" (Eric Ries), "Hooked" (Nir Eyal)</li>
+      <li><strong>Sales:</strong> Cold outreach và sales cho founder kỹ thuật (bổ sung khi vào B3)</li>
+      <li><strong>Pháp lý VN:</strong> Đăng ký hộ kinh doanh / công ty TNHH khi bắt đầu có doanh thu</li>
+    </ul>
+  </TabItem>
+</Tabs>
+
+## 12. Verify — Kiểm tra
+
+### Feynman Technique
+
+<div class="modern-card accent-info">
+  <h3>Giải thích lại cho người khác</h3>
+  <p><em>"Mỗi checkbox trong checklist là một kiến thức bạn PHẢI giải thích được cho người khác. Nếu không giải thích được, chưa hiểu sâu — quay lại học."</em></p>
+</div>
+
+### Self-check (3 câu hỏi)
+
+<Tabs>
+  <TabItem label="Câu 1">
+    <p><strong>"Tại sao không học cả Nhánh A và Nhánh B cùng lúc?"</strong></p>
+    <p>Hai con đường cần kỹ năng khác nhau ở giai đoạn nâng cao. Học cả hai kéo bạn về hai ưu tiên đối nghịch → kiệt sức mà không đạt được gì.</p>
+  </TabItem>
+  <TabItem label="Câu 2">
+    <p><strong>"Khi nào mới quyết định chọn nhánh?"</strong></p>
+    <p>Sau khi hoàn thành 3 khối lõi chung (~tháng 9–12), dựa trên hoàn cảnh thực tế lúc đó — tài chính, ý tưởng, offer việc làm, ràng buộc cá nhân.</p>
+  </TabItem>
+  <TabItem label="Câu 3">
+    <p><strong>"Tại sao học theo chiều ngang thay vì chiều dọc?"</strong></p>
+    <p>Học chiều dọc (HTML → CSS → JS → React → Node → DB) xong mới làm project = không có gì demo. Học chiều ngang = 1 project hoàn chỉnh mỗi tháng, có thể đưa vào portfolio.</p>
+  </TabItem>
+</Tabs>
+
+<Aside type="tip" title="Integration Check">
+  Lộ trình này nhúng vào <strong>tất cả project P1–P6</strong> theo <strong>Loại A</strong> (kiến thức nền tảng áp dụng xuyên suốt).
+</Aside>
 
 ---
 
-<div class="callout-quote">
-  <h2>"Không hời hợt, nghiên cứu sâu."</h2>
-  <p>
-    Mỗi checkbox trong checklist là một kiến thức bạn <strong>phải giải thích được</strong> cho người khác.<br/>
-    Nếu không giải thích được, chưa hiểu sâu — quay lại học.
-  </p>
+<div class="modern-card accent-ops">
+  <h3>
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+    Trạng thái Buổi Học
+  </h3>
+  <details>
+    <summary>Xem chi tiết trạng thái</summary>
+    <table>
+      <tbody>
+        <tr><td>Current File</td><td><code>00-roadmap-overview.mdx</code></td></tr>
+        <tr><td>Day In File</td><td><strong>1 / 1</strong></td></tr>
+        <tr><td>Total Days Completed</td><td><strong>0</strong></td></tr>
+        <tr><td>Completed Files</td><td><code>[]</code></td></tr>
+        <tr><td>Notes</td><td>Trang tổng quan — không có bài tập cụ thể, dùng để định hướng toàn bộ lộ trình</td></tr>
+      </tbody>
+    </table>
+    <span class="flex-wrap-badges">
+      <Badge text="P1: not started" variant="danger" />
+      <Badge text="P2: not started" variant="danger" />
+      <Badge text="P3: not started" variant="danger" />
+      <Badge text="P4: not started" variant="danger" />
+      <Badge text="P5: not started" variant="danger" />
+      <Badge text="P6: not started" variant="danger" />
+    </span>
+  </details>
+  <p class="mt-sm"><strong>Next Topic</strong></p>
+  <p>Buổi 1: Mục tiêu & Thông tin cá nhân → <code>01-goals-and-info.mdx</code></p>
 </div>

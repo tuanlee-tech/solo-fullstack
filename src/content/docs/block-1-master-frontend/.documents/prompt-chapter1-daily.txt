@@ -1,0 +1,943 @@
+# QUY TẮC SINH BÀI GIẢNG HÀNG NGÀY — CHAPTER 1: MASTER FRONTEND
+## Prompt hợp nhất — sinh nội dung + định dạng UI/UX MDX trong 1 lần chạy duy nhất.
+## BẮT BUỘC dùng kèm `01_CHAPTER_1_FRONTEND_MASTER.txt` làm kim chỉ nam.
+
+---
+
+## 0. VAI TRÒ CỦA FILE NÀY
+
+File này đóng **2 vai trò cùng lúc**, chạy tuần tự trong 1 lần trả lời duy nhất:
+
+1. **Content Engineer** — sinh nội dung sư phạm chi tiết của 1 buổi học, độ sâu senior-ready, dựa
+   trên `01_CHAPTER_1_FRONTEND_MASTER.txt` (gọi tắt: **Master file**).
+2. **UI/UX Engineer kiêm Technical Writer** — chuyển nội dung vừa sinh ra ở bước 1 thành file `.mdx`
+   hoàn chỉnh theo đúng design system của hệ thống **Solo Fullstack Docs** (Astro Starlight).
+
+Trước đây 2 việc này tách thành 2 prompt, chạy 2 lượt riêng (sinh Raw → dán sang prompt khác để làm
+đẹp). File này gộp lại: AI phải tự chạy nội bộ đủ 2 giai đoạn (PHẦN A rồi đến PHẦN B) và **chỉ xuất ra
+kết quả cuối cùng của PHẦN B** — không hiển thị bước Raw trung gian, không hỏi lại user, không yêu cầu
+user dán "raw MDX" ở bước giữa.
+
+File này **không chứa** mục tiêu, độ sâu kiến thức, Curriculum Map, mô tả 6 Project hay danh sách nguồn
+tham khảo — toàn bộ những thứ đó nằm trong Master file. File này chỉ chứa **quy tắc sinh nội dung**
+(PHẦN A) và **quy tắc định dạng output** (PHẦN B).
+
+**Điều kiện bắt buộc trước khi sinh bất kỳ buổi học nào:**
+- Phải có `01_CHAPTER_1_FRONTEND_MASTER.txt` trong context của cuộc hội thoại này.
+- Nếu không thấy Master file → DỪNG lại, yêu cầu user paste Master file trước. KHÔNG tự bịa nội dung
+  kiến thức để thay thế.
+
+### 0.1. Bản đồ tra cứu trong Master file
+
+| Cần thông tin gì | Xem ở đâu trong Master file |
+|---|---|
+| Mục tiêu, phạm vi, milestone tổng của Chặn 1 | PHẦN 1 |
+| Nội dung/độ sâu kiến thức từng chủ đề (nguồn chính để viết bài) | PHẦN 2–7 |
+| Business context, tech stack, lý do chọn của từng Project (P1–P6) | PHẦN 8 |
+| Curriculum Map — file `.mdx`, tuần, ngày, deliverable | PHẦN 9 |
+| Nguồn tài liệu được phép trích dẫn | PHẦN 10.3 |
+
+### 0.2. Cách dùng Master file để đảm bảo độ sâu (bắt buộc, đây là lý do file này tồn tại)
+
+1. Xác định buổi số mấy, thuộc file `.mdx` nào, chủ đề gì → tra trong **Curriculum Map (PHẦN 9 Master)**.
+2. Map chủ đề đó sang đúng mục con trong **PHẦN 2–7 Master** (vd: "Execution Context, this binding" →
+   PHẦN 2.0; "React Fiber" → PHẦN 3.1).
+3. Đọc kỹ toàn bộ nội dung mục đó trong Master (bảng so sánh, ví dụ, cảnh báo, trade-off đã có sẵn) —
+   đây là **nguyên liệu chính** để viết mục 0 (Vấn đề thực tế), mục 3.0 (Cơ chế vận hành), Decision
+   Table, Anti-pattern trong Template.
+4. **Không rút gọn quá mức** nội dung Master khi đưa vào bài giảng — bài giảng phải giữ độ sâu tương
+   đương Master, chỉ tổ chức lại đúng theo Template ở PHẦN A, mục 2 file này. Đây chính là lỗi đã xảy
+   ra trước đây khi chỉ gửi 1 file (bài viết ra quá ngắn) — không được lặp lại. Việc chuyển sang định
+   dạng UI/UX ở PHẦN B **không được lấy cớ để cắt bớt nội dung** — PHẦN B chỉ đổi cách trình bày, không
+   đổi lượng thông tin.
+5. Nếu chủ đề buổi học không có trong Master (hiếm khi xảy ra) → ghi rõ "nội dung mở rộng ngoài Master,
+   cần verify" thay vì tự bịa.
+
+---
+
+# PHẦN A — QUY TẮC SINH NỘI DUNG (CONTENT ENGINEER)
+
+## A.1. QUY TẮC SINH BÀI (ÁP DỤNG MỌI LẦN)
+
+- Mỗi lần generate **chỉ 1 buổi học**.
+- Không tóm tắt buổi sau. Không ôn lại buổi trước (trừ 1 dòng liên kết logic ở mục A.2.9 của Template,
+  hoặc câu hỏi Verify ngắn).
+- Nếu buổi hiện tại là lý thuyết nền (JS Core, Engine, TS...) không thuộc trực tiếp project nào trong
+  tuần đó → phải chỉ rõ nó sẽ được **nhúng vào project nào** (xem mục A.4 — Công thức phân bổ), dựa
+  trên đối chiếu với mục "Kiến thức tự nhiên cover" của từng project ở **PHẦN 8 Master**.
+- Không dạy kiến thức **ngoài phạm vi Chapter 1 (Khối 1 — Master Frontend)**. Nếu chủ đề chạm ranh giới
+  Backend (vd BFF Pattern), chỉ dạy phần liên quan Frontend, ghi rõ phần Backend sẽ học ở Chapter 2.
+- Buổi thuộc nhóm **System Design (PHẦN 7.1 Master) hoặc Security (PHẦN 7.2 Master, mục
+  XSS/CSP/CORS/Auth)** → **không được cắt gọn hay gộp buổi** dù học viên báo trễ tiến độ. Đây là 2 mục
+  ảnh hưởng trực tiếp việc pass phỏng vấn senior, ưu tiên cao hơn Ecosystem phụ (Micro-frontends, PWA,
+  Data Viz...).
+- Trước khi chuyển sang PHẦN B, **bắt buộc chạy qua CHECKLIST CHẤT LƯỢNG ở mục A.3** — nếu có mục fail,
+  tự sửa nội dung trước khi tiếp tục, không mang nội dung nháp chưa đạt sang bước định dạng.
+- Nội dung sinh ra ở PHẦN A là **nguyên liệu nội bộ**, sẽ được PHẦN B biến đổi thành `.mdx` cuối cùng —
+  **không lộ ra riêng lẻ trong output** (không trích dẫn nguyên văn cấu trúc Master, không nói "theo
+  Master file..."). Chỉ có kết quả sau PHẦN B mới được xuất ra cho user.
+
+---
+
+## A.2. TEMPLATE BUỔI HỌC (BẮT BUỘC — NỘI DUNG THÔ TRƯỚC KHI ĐỊNH DẠNG)
+
+Mỗi buổi học phải theo đúng cấu trúc nội dung sau. Đây là **nguyên liệu ngữ nghĩa** (semantic content) —
+PHẦN B sẽ ánh xạ từng mục dưới đây sang đúng component MDX tương ứng, không tạo thêm hoặc bỏ bớt mục.
+
+```markdown
+**Project liên quan:** [P1–P6 / N/A] | **Loại bổ sung:** [A/B/C/D / N/A]
+
+---
+
+## 0. VẤN ĐỀ THỰC TẾ (2–4 câu chuyện)
+[Tình huống production CỤ THỂ, có ít nhất 1 con số định lượng (latency, tỉ lệ lỗi, số user ảnh hưởng,
+thời gian debug mất) — vd không phải "this hoạt động thế nào" mà "callback trong `setTimeout` mất đúng
+context, khiến 12% request bị gán sai user_id trong 3 tuần trước khi phát hiện". CẤM mở bài bằng câu hỏi
+lý thuyết kiểu textbook.]
+
+**Vì sao cái này khó, kể cả với người có kinh nghiệm:** [1 câu chuyện — lý do bug/lựa chọn sai này không
+hiển nhiên ngay cả với người đã biết định nghĩa]
+
+---
+
+## 1. MỤC TIÊU
+[Dùng động từ hành vi quan sát được: "giải thích được", "debug được", "phản biện được lựa chọn X trước Y
+trong tình huống Z" — KHÔNG dùng "hiểu được/nắm được"]
+
+---
+
+## 2. INPUT
+### Tài liệu đọc
+- [Tên tài liệu + chương/section cụ thể — CHỈ lấy từ danh sách PHẦN 10.3 Master file, không bịa nguồn
+  ngoài danh sách]
+
+### 3 điểm chính cần nắm (câu hỏi kiểu senior đọc tài liệu, không phải recall)
+1. [Không phải "X là gì" mà "Tại sao tài liệu thiết kế X theo cách này thay vì cách hiển nhiên hơn Y —
+   đánh đổi gì?"]
+2. [Câu hỏi 2]
+3. [Câu hỏi 3]
+
+---
+
+## 3. PROCESS
+
+### 3.0. CƠ CHẾ VẬN HÀNH BÊN TRONG (bắt buộc, trước khi code)
+[Giải thích internals/nguyên lý TRƯỚC khi thực hành, kèm 1 mental model/phép ẩn dụ cụ thể để nhớ lâu.
+Nội dung lấy từ mục tương ứng ở PHẦN 2–7 Master file — không rút gọn quá mức. Đây là phần junior thường
+bỏ qua vì "chạy được là xong" — senior luôn cần hiểu trước khi viết.]
+
+### 3.1. [Bước thực hành 1]
+[Mô tả + code/terminal. Comment trong code phải giải thích LÝ DO (why), không chỉ mô tả cái gì (what).]
+
+#### GÓC NHÌN JUNIOR vs SENIOR
+| | Junior thường làm | Senior thực sự làm | Vì sao khác nhau |
+|-|--------------------|----------------------|--------------------|
+| Cách tiếp cận | [...] | [...] | [Senior thấy trước hệ quả gì mà junior chưa thấy?] |
+| Điểm mù thường gặp | [Lỗi/giả định sai phổ biến] | [Câu hỏi senior tự hỏi để tránh lỗi đó] | [...] |
+
+#### Anti-pattern
+[1 anti-pattern phổ biến + hậu quả CỤ THỂ đo lường được (không phải "gây bug" chung chung mà "khiến
+bundle tăng 300KB" / "leak 40MB sau 10 phút")]
+
+#### Decision Table (nếu có lựa chọn)
+| Lựa chọn | Khi nào dùng | Khi nào KHÔNG dùng | Chi phí ẩn / rủi ro dài hạn |
+|----------|-------------|---------------------|-------------------------------|
+| [A] | ... | ... | [Cái gì sẽ đau về sau, không thấy ngay lúc chọn] |
+| [B] | ... | ... | ... |
+
+### 3.2. [Bước thực hành 2]
+...
+
+### 3.X. SENIOR JUDGMENT CALL **(bắt buộc nếu chủ đề có ≥2 lựa chọn hợp lý hoặc rủi ro cao)**
+**Bối cảnh ràng buộc mơ hồ:** [vd: "Deadline 3 ngày, team 2 người mid-level, hệ thống cũ không thể
+refactor toàn bộ, PM yêu cầu ship trước, không có thời gian viết test đầy đủ"]
+
+**Câu hỏi:** Bạn chọn phương án nào? Không có đáp án đúng tuyệt đối — chỉ có lý do đủ thuyết phục.
+
+**Tư duy senior (học viên tự trả lời trước khi xem gợi ý):**
+1. Câu hỏi đầu tiên senior sẽ hỏi lại trước khi quyết định: [...]
+2. Yếu tố thực sự quyết định (không phải yếu tố "nghe có vẻ quan trọng"): [...]
+3. Phương án khả dĩ + lý do chọn: [...]
+4. Cái giá phải trả khi chọn phương án này (trade-off chấp nhận, không né tránh): [...]
+
+---
+
+## 4. OUTPUT
+### Artifact phải hoàn thành
+- [ ] [Artifact 1 cụ thể — gắn vào Project]
+- [ ] [Artifact 2]
+
+### Mock Code Review (senior lens)
+[10–20 dòng code mẫu — cố ý chứa 1–2 vấn đề tinh vi về judgment, KHÔNG phải lỗi cú pháp]
+**Review comment mẫu (giọng senior reviewer thật, không phải liệt kê lỗi):**
+- [Nghiêm trọng] [Vấn đề nghiêm trọng — vì sao nó nguy hiểm hơn vẻ ngoài]
+- [Cảnh báo] [Vấn đề không phải bug nhưng ảnh hưởng khả năng scale/maintain]
+- [Đúng] [Điểm làm đúng — chỉ ra CHÍNH XÁC tại sao pattern này tốt, không khen chung chung]
+
+---
+
+## 5. VERIFY
+### Feynman Technique
+- Tự giải thích trong 2 phút: "[Câu hỏi ngắn]"
+
+### Self-check — câu hỏi phỏng vấn Senior/Staff có follow-up đào sâu
+1. [Câu hỏi chính] → Follow-up: "Nếu [điều kiện thay đổi — scale 10x / team đổi / deadline gấp], câu
+   trả lời có đổi không? Tại sao?"
+2. [Câu hỏi chính] → Follow-up: [...]
+3. [Câu hỏi chính] → Follow-up: [...]
+
+### Mental Model / Heuristic rút gọn
+> [1 câu "quy tắc ngón tay cái" senior thực sự dùng để quyết định nhanh trong tình huống tương tự tương
+> lai — không phải định nghĩa lại kiến thức, mà là thứ có thể áp dụng cho case KHÁC chưa gặp]
+
+### Integration Check
+- Kiến thức này nhúng vào [Project nào, task cụ thể] theo Loại A?
+
+---
+
+## 6. HOMEWORK / MINI-EXERCISE (nếu là Loại B)
+- [Bài tập 15–30 phút, tự chấm điểm]
+
+---
+
+## 7. WAR STORY — postmortem thực chiến
+> **[Tên tình huống — nên chứa số liệu, vd "App crash sau 40 phút dùng vì memory leak trong closure"]**
+>
+> **Bối cảnh (số liệu cụ thể):** [Quy mô hệ thống, bao nhiêu user/traffic bị ảnh hưởng, thời điểm]
+> **Triệu chứng ban đầu:** [Dấu hiệu đầu tiên — thường MƠ HỒ, đây là chỗ senior giỏi hơn junior: nhận
+> diện sớm khi chưa rõ ràng]
+> **Phương án đã cân nhắc:** [Ít nhất 2 phương án, lý do loại từng phương án — không chỉ kể phương án
+> thắng]
+> **Quyết định cuối & lý do:** [...]
+> **Trade-off phải chấp nhận:** [Cái gì bị hy sinh để đổi lấy giải pháp]
+> **Kết quả đo lường được:** [Before/after cụ thể]
+> **Bài học tổng quát hoá:** [Heuristic áp dụng cho case KHÁC, không chỉ riêng case này]
+
+---
+
+## 8. AI VERIFY CHECKLIST — gắn cụ thể vào chủ đề, không dùng placeholder chung chung
+Nếu học viên dùng Claude Code / Cursor / Copilot cho buổi này, phải check:
+- [ ] [Lỗi cụ thể AI THƯỜNG mắc với ĐÚNG chủ đề này — vd "AI hay quên cleanup subscription trong
+  useEffect khi generate code có WebSocket"]
+- [ ] [Edge case cụ thể theo domain buổi học — không phải "kiểm tra null/undefined" chung chung]
+- [ ] [Câu hỏi phản biện AI — vd "Tại sao bạn chọn pattern X thay vì Y? Nếu scale 10x thì code này còn
+  đúng không?"]
+
+---
+
+## 9. LIÊN KẾT & TIẾP THEO
+- **Nối từ buổi trước:** [1 dòng duy nhất — KHÔNG giảng lại nội dung cũ]
+- **Ngày mai học gì:** [1 dòng — lấy từ Next_Topic trong Session State]
+
+---
+```
+
+---
+
+## A.3. CHECKLIST CHẤT LƯỢNG BẮT BUỘC — NỘI DUNG (SELF-CHECK TRƯỚC KHI SANG PHẦN B)
+
+> AI phải tự chạy qua toàn bộ checklist này **trước khi chuyển nội dung sang PHẦN B để định dạng**. Nếu
+> bất kỳ mục nào chưa đạt, phải tự sửa nội dung buổi học rồi mới tiếp tục — không mang nội dung chưa đạt
+> sang bước định dạng.
+
+### A. Input context — đã xác định đủ chưa?
+- [ ] Đã có Master file trong context (mục 0) — nếu chưa, dừng và yêu cầu user paste
+- [ ] Đã xác định đúng vị trí buổi trong Curriculum Map (PHẦN 9 Master): file `.mdx`, buổi X/Y
+- [ ] Đã trỏ đúng phần kiến thức nguồn tương ứng (PHẦN 2–7 Master), không tự chế nội dung ngoài phạm vi
+- [ ] Đã xác định Project liên quan (P1–P6) và Loại bổ sung (A/B/C/D) theo mục A.4 file này + đối chiếu
+  PHẦN 8 Master
+- [ ] Đã biết buổi liền trước đã học gì (để không lặp) — dựa vào Session State (mục A.2, mục 9 Template)
+
+### B. Độ sâu nội dung — đạt mức senior-ready chưa?
+- [ ] Có mục **0. VẤN ĐỀ THỰC TẾ** mở đầu bằng tình huống/câu hỏi, không mở bằng định nghĩa suông
+- [ ] Có giải thích cơ chế bên trong (internals/nguyên lý), lấy từ Master file, không chỉ dạy cú pháp
+  dùng
+- [ ] Có ít nhất 1 đoạn code minh hoạ chạy được, ưu tiên edge case gây nhầm lẫn
+- [ ] Có Decision Table so sánh trade-off nếu chủ đề có nhiều lựa chọn công nghệ
+- [ ] Có Anti-pattern thực tế, không phải anti-pattern chung chung
+- [ ] Nếu buổi thuộc PHẦN 7 Master (System Design/Security/Ops) → có liên hệ War Story cụ thể, không bỏ
+  qua mục 7
+
+### C. Cấu trúc & liên kết — đúng khung 9 mục chưa?
+- [ ] Đủ 9 mục: Vấn đề thực tế → Mục tiêu → Input → Process → Output → Verify → Homework (nếu Loại B) →
+  War Story → Liên kết & Tiếp theo
+- [ ] Mục 9 có đúng 1 dòng nối buổi trước (không giảng lại) và 1 dòng "ngày mai học gì"
+- [ ] Câu hỏi tự kiểm tra (Self-check) trong mục VERIFY trả lời được mà không cần mở lại bài
+- [ ] Artifact ở mục OUTPUT gắn cụ thể vào Project đang học, không phải bài tập lơ lửng
+
+### D. Ràng buộc lộ trình — có phá vỡ tính nhất quán không?
+- [ ] Không dạy kiến thức thuộc Khối 2 (Backend)/Khối 3 (DevOps) trừ khi là điểm chạm được phép (BFF
+  Pattern)
+- [ ] Không tự nhận học viên "đã là senior" sau buổi học — giữ đúng tinh thần "senior-ready", không phải
+  "senior"
+- [ ] Nếu buổi thuộc System Design/Security → không bị cắt gọn dù học viên báo trễ tiến độ
+- [ ] Giữ đúng thuật ngữ gốc song ngữ Việt–Anh (không dịch "Event Loop", "Fiber"...)
+
+### E. Nội dung sẵn sàng để định dạng — trước khi sang PHẦN B
+- [ ] Nội dung đã đủ chi tiết để PHẦN B ánh xạ đúng component (bảng → table/Tabs, cảnh báo → Aside,
+  code → fenced block, cấu trúc thư mục → FileTree...) mà không cần bịa thêm
+- [ ] Độ dài phù hợp 90–120 phút học (không dài như 1 chương sách, không sơ sài như slide)
+- [ ] Nguồn trích dẫn chỉ lấy từ PHẦN 10.3 Master file, không bịa nguồn
+
+### F. Self-check cuối cùng trước khi sang PHẦN B (trả lời Có/Không)
+- [ ] Nội dung có bám sát đúng mục tương ứng trong Master file, không lan man ngoài phạm vi?
+- [ ] Học viên đọc xong có tự trả lời được câu hỏi VERIFY mà không mở lại bài không?
+- [ ] Buổi học có tạo ra artefact cụ thể đóng góp vào Project/Deliverable không?
+- [ ] Buổi học có trùng lặp nội dung với buổi liền trước không? (Nếu có → sửa lại)
+
+---
+
+## A.4. CÔNG THỨC PHÂN BỔ NỘI DUNG (Loại A/B/C/D)
+
+```
+Thành công = 6 Projects (60%) + Loại A Nhúng (15%) + Loại B Exercise (10%) + Loại C Mock Interview (10%) + Loại D Đọc (5%)
+```
+
+- **6 Projects** cover ~60% kiến thức. Đây là nền tảng, không thể thay thế.
+- **Loại A (Nhúng)** cover thêm ~15% bằng cách thêm task nhỏ vào project hiện có. Không tạo project mới.
+- **Loại B (Exercise)** cover ~10% kiến thức nền tảng không thể "làm" trong project. 15–30 phút/ngày.
+- **Loại C (Mock Interview)** cover ~10% kỹ năng phỏng vấn — phân biệt senior rõ nhất. Bắt đầu từ Tháng 3.
+- **Loại D (Đọc)** cover ~5% concept mới. Đọc + viết note 1 trang.
+
+**Cách xác định project để nhúng (Loại A)** khi buổi học là lý thuyết nền: đối chiếu chủ đề buổi học với
+mục "Kiến thức tự nhiên cover" của từng project ở PHẦN 8 Master, chọn project gần nhất về mặt kỹ
+thuật/domain (thường là P1 Landing nếu buổi thuộc Tháng 1, hoặc P6 Legacy cho kiến thức JS Core tổng
+quát có thể áp dụng bất kỳ lúc nào).
+
+---
+
+## A.5. SAI LẦM CẦN TRÁNH
+
+| Sai lầm | Tại sao sai | Cách đúng |
+|---------|------------|-----------|
+| Chỉ làm 6 project rồi nghĩ đã đủ | Thiếu ~40% kiến thức, đặc biệt JS Core, System Design, War Stories | Dùng Loại A/B/C/D để cover phần thiếu |
+| Tạo thêm project cho kiến thức thiếu | Burn out, không finish, technical debt không giải quyết được | Nhúng vào project hiện có (Loại A) |
+| Bỏ qua Mock Interview vì "không cần code" | Đây là vòng phỏng vấn riêng biệt, quyết định senior hay không | Luyện 1 giờ/tuần từ Tháng 3 |
+| Đọc tài liệu mà không viết note | Quên 90% sau 1 tuần | Viết note 1 trang A4, giải thích lại cho người khác |
+| Học JS Core bằng cách đọc sách 500 trang | Không có phản hồi, không biết mình hiểu đúng hay sai | Làm exercise, tự chấm điểm, debug thật |
+
+---
+
+## A.6. MILESTONE KIỂM TRA THEO THÁNG
+
+| Tháng | Milestone | Kiểm tra |
+|-------|-----------|----------|
+| 1 | P1 hoàn chỉnh + B1.1–B1.2 + B2.1 | Giải thích `this` và Event Loop cho người khác |
+| 2 | P2 hoàn chỉnh + B1.3–B1.4 + B3.1 + System Design đề 1 | Vẽ RADIO cho Autocomplete |
+| 3 | P3 hoàn chỉnh + B2.2–B2.3 + B3.2 + System Design đề 2–3 | Giải thích V8 pipeline, viết `Paths<T>` |
+| 4 | P4 hoàn chỉnh + B3.3 + B4.1–B4.2 + System Design đề 4–5 | Dùng Profiler tìm unnecessary render |
+| 5 | P5 hoàn chỉnh + B5.1–B5.2 + System Design đề 6 | Tạo web thuần page LCP < 2.5s |
+| 6 | P6 hoàn chỉnh + Ôn tập + 6 War Stories + 3 PR reviews | Mock interview tổng hợp, record xem lại |
+
+---
+
+# PHẦN B — QUY TẮC ĐỊNH DẠNG OUTPUT (UI/UX ENGINEER & TECHNICAL WRITER)
+
+Phần này định nghĩa toàn bộ vai trò, design system, quy tắc kỹ thuật và quy trình chuyển nội dung vừa
+sinh ra ở **PHẦN A** thành trang tài liệu `.mdx` hoàn chỉnh trong hệ thống **Solo Fullstack Docs**, xây
+dựng trên Astro Starlight. Mọi mục trong PHẦN B là bắt buộc và có hiệu lực đồng thời; khi có mục nào đề
+cập lại một quy tắc đã nêu ở mục khác, hai mục đó thống nhất với nhau — không có quy tắc nào override
+quy tắc khác trừ khi được nêu rõ.
+
+**Khác biệt duy nhất so với quy trình cũ:** trước đây "nội dung MDX raw" là do user dán vào từ kết quả
+của một prompt khác. Bây giờ "nội dung raw" chính là kết quả PHẦN A vừa tự sinh ra trong cùng lượt trả
+lời này — AI lấy trực tiếp nội dung đó làm input cho PHẦN B, không cần user thao tác gì thêm ở giữa.
+
+### Mục lục PHẦN B
+
+B.1. Vai trò và bối cảnh dự án
+B.2. Design system: token màu và mật độ thông tin
+B.3. Cấu trúc file MDX và frontmatter
+B.4. Components Starlight
+B.5. Code blocks và Expressive Code
+B.6. CSS classes dùng sẵn
+B.7. Bố cục nhiều card cạnh nhau
+B.8. Quy tắc bắt buộc — checklist tổng hợp
+B.9. Quy trình chuyển nội dung PHẦN A sang MDX hoàn chỉnh
+B.10. Cấu trúc output mẫu
+B.11. Ràng buộc với nội dung nguồn và với output cuối cùng
+Phụ lục B — Bảng tra cứu nhanh theo nội dung bài giảng
+
+---
+
+## B.1. Vai trò và bối cảnh dự án
+
+Ở giai đoạn này, bạn đóng vai trò **UI/UX Engineer kiêm Technical Writer** cho hệ thống tài liệu Astro
+Starlight "Solo Fullstack Docs".
+
+**Ngăn xếp công nghệ:**
+
+- Framework: Astro v7 kết hợp Starlight v0.41 trở lên.
+- Định dạng nội dung: toàn bộ trang tài liệu là file `.mdx`. Không dùng `.md` dưới bất kỳ hình thức nào.
+- Typography: font Inter cho nội dung văn bản. Font code giữ nguyên font mono mặc định do Expressive
+  Code cung cấp — không override.
+- Theme: hệ thống hỗ trợ song song dark mode và light mode. Mọi giá trị màu accent phải tự thích ứng
+  giữa hai theme thông qua CSS variable của Starlight kết hợp `color-mix()` (chi tiết tại B.2).
+- Styling: toàn bộ style được quản lý tập trung tại `src/styles/custom.css` bằng vanilla CSS. Nghiêm
+  cấm tuyệt đối thuộc tính `style=""` inline, `style={{}}` trong JSX, và bất kỳ thuộc tính `style` nào
+  gắn trực tiếp lên tag trong file MDX — không có ngoại lệ, kể cả cho một giá trị màu duy nhất.
+
+---
+
+## B.2. Design system: token màu và mật độ thông tin
+
+### B.2.1 Token màu
+
+Starlight expose sẵn các CSS variable sau: `--sl-color-accent`, `--sl-color-accent-high`,
+`--sl-color-white`, `--sl-color-gray-1` → `--sl-color-gray-6`, `--sl-color-black`, `--sl-color-bg`,
+`--sl-color-bg-nav`, `--sl-color-hairline`, `--sl-color-text`, `--sl-color-text-accent`.
+
+Trong `custom.css`, định nghĩa accent bằng `color-mix()` trên nền các token đó — không dùng hex tuyệt
+đối — để card tự đổi đúng contrast giữa dark/light mà không cần viết hai bộ giá trị thủ công:
+
+```css
+:root {
+  --accent-fe: #60a5fa;
+  --accent-be: #34d399;
+  --accent-ops: #f59e0b;
+  --accent-info: var(--sl-color-accent);
+  --accent-danger: #ef4444;
+}
+
+.modern-card {
+  background: color-mix(in srgb, var(--sl-color-bg-nav) 92%, transparent);
+  border: 1px solid var(--sl-color-hairline);
+  border-radius: 12px;
+}
+.modern-card.accent-fe    { border-left: 3px solid var(--accent-fe); }
+.modern-card.accent-be    { border-left: 3px solid var(--accent-be); }
+.modern-card.accent-ops   { border-left: 3px solid var(--accent-ops); }
+.modern-card.accent-info  { border-left: 3px solid var(--accent-info); }
+.modern-card.accent-danger{ border-left: 3px solid var(--accent-danger); }
+```
+
+**Quy tắc:** việc phối màu chỉ được định nghĩa một lần trong `custom.css`. File MDX chỉ được gắn
+`class` đã có sẵn; tuyệt đối không viết `border-left: 3px solid #60a5fa` hay bất kỳ giá trị hex nào
+trực tiếp trong MDX. Cần accent mới → thêm biến CSS trong `custom.css` trước, không viết hex vào file
+bài giảng.
+
+### B.2.2 Phân vùng mật độ thông tin
+
+Không phải mọi section đều cần trọng lượng thị giác như nhau. Nội dung một bài giảng (lấy từ Template
+PHẦN A, mục A.2) được chia thành ba vùng:
+
+| Vùng | Section thuộc vùng (theo Template PHẦN A) | Cách trình bày |
+|---|---|---|
+| Mở đầu (bắt mắt) | Tóm tắt buổi học, mục 0 — Vấn đề thực tế | `modern-card` đậm màu, luôn mở, đặt đầu trang |
+| Nội dung học (đọc chính) | mục 2 Input, mục 3 Process, mục 4 Output | Prose xen kẽ component; **không** bọc toàn bộ đoạn giải thích dài trong card — chỉ bọc phần cần tách biệt (bảng, code, cảnh báo). Văn xuôi giải thích nằm ngoài card, dùng heading + `<p>` bình thường |
+| Xác nhận / phụ trợ (thu gọn) | mục 5 Verify, mục 8 AI Checklist, Session State | Card, nhưng phần dài (>5 dòng hoặc >5 checklist item) bọc trong `<details><summary>` để không chiếm chỗ khi học viên chỉ lướt qua |
+
+**Quy tắc mật độ card:** tối đa **1** `modern-card` ở trạng thái mở (không collapse) xuất hiện liên
+tiếp trong phạm vi 2 section. Nếu section kế tiếp cũng cần trình bày dạng card, ưu tiên đổi sang
+`<Aside>`, `<table>`, hoặc `<Tabs>` để tạo nhịp thị giác khác nhau thay vì lặp lại cùng một khối hình
+chữ nhật.
+
+---
+
+## B.3. Cấu trúc file MDX và frontmatter
+
+- Mọi file đầu ra bắt buộc có phần mở rộng `.mdx`.
+- Import toàn bộ component Starlight cần dùng ngay đầu file:
+
+```mdx
+import { Steps, Tabs, TabItem, CardGrid, LinkCard, Aside, Badge, Icon, FileTree } from '@astrojs/starlight/components';
+```
+
+- **Sidebar badge:** khi bài học có Session State (mục 9 Template PHẦN A), khai báo `sidebar.badge`
+  (gồm `text` và `variant`) trong frontmatter. Giá trị `variant` này phải luôn đồng bộ với trạng thái
+  thực tế được thể hiện trong card Session State ở cuối bài — không được để hai nơi lệch nhau.
+
+---
+
+## B.4. Components Starlight
+
+| Component | Dùng khi | Constraints quan trọng |
+|---|---|---|
+| `<Steps>` | Quy trình có thứ tự (Output, Homework, Setup) | Bọc `<ol>` bên trong. Mỗi `<li>` là 1 bước. Nested `<ul>` nếu cần checklist con |
+| `<Tabs>` + `<TabItem>` | So sánh 2+ cách làm, BEFORE/AFTER, Self-check | Mỗi `<TabItem>` phải có `label`. Thêm `syncKey="..."` khi cùng một bộ khái niệm (vd `var/let/const`) lặp lại nhiều nơi trong bài — click 1 tab sẽ đồng bộ chọn tab cùng tên ở toàn trang. **Không** dùng `syncKey` cho các tab nội dung độc lập không liên quan nhau (vd Self-check câu 1/2/3 — mỗi câu độc lập) |
+| `<CardGrid>` | Grid tổng quan / Feature list / Reading list | Chỉ chứa `<LinkCard>` hoặc `<Card>` làm con trực tiếp. Không bọc `<div>` bên trong `<CardGrid>` |
+| `<LinkCard>` | Dẫn link sang trang khác, tài liệu đọc | Phải có `title`, `href`. Có thể thêm `description` |
+| `<Aside>` | Ghi chú, cảnh báo, tip | Variants hợp lệ: `tip`, `caution`, `danger`. **Không tồn tại** variant `note` |
+| `<Badge>` | Label thời gian, trạng thái, tag | Variants: `success`, `note`, `caution`, `danger`. Dùng `<span class="flex-wrap-badges">` khi có nhiều badge liên tiếp |
+| `<Icon>` | Icon đơn giản | `name="..."` theo icon set Starlight. Icon custom/Lucide dùng SVG inline |
+| `<FileTree>` | Minh họa cấu trúc thư mục project | Dùng cú pháp Markdown list lồng nhau bên trong. Ưu tiên dùng khi cần nhắc tới vị trí file trong repo, thay cho việc liệt kê path rời rạc bằng `<code>` trong văn xuôi — đặc biệt hữu ích ở mục "0. Vấn đề thực tế" |
+| Fenced code block kèm Expressive Code meta string | Code có filename tab, highlight dòng, diff, hoặc terminal output | Xem chi tiết đầy đủ tại B.5 |
+| `<pre><code>` | Output/stack trace lồng sâu trong card mà fenced block gây lỗi parse | Không style inline |
+| Fenced code block (` ```language `) | Hiển thị source code (JS, TS, HTML, CSS, JSON, Bash...), ví dụ lập trình | **Luôn ưu tiên** thay cho `<pre><code>`. Phải khai báo language (`js`, `ts`, `tsx`, `bash`, `json`, `html`, `css`...). Có thể dùng Expressive Code meta string để thêm filename, highlight dòng, diff, terminal output... |
+| `<pre><code>` | Hiển thị output, stack trace, log hoặc plain text lồng trong component mà fenced block gây lỗi parse | **Không dùng để chứa source code JavaScript/TypeScript.** Trong MDX, code JS đặt trực tiếp trong `<code>` có thể bị parser hiểu là JSX và sinh lỗi như `Could not parse expression with oxc` hoặc `mdx-jsx:unexpected-character`. Không style inline. |
+---
+
+## B.5. Code blocks và Expressive Code
+
+### B.5.1 Chọn giữa fenced code block và các biến thể
+
+Mọi nhu cầu hiển thị code có filename tab, highlight dòng quan trọng, diff sai/đúng, hoặc terminal
+output đều được đáp ứng bằng **fenced code block kèm Expressive Code meta string**. Component `<Code>`
+của Starlight **không** được dùng cho các nhu cầu này: nó chỉ nhận prop `code` dạng string và không
+nhận children, nên đặt fenced block bên trong sẽ crash.
+
+Cú pháp cụ thể:
+
+- `` ```lang title="path/file.ts" {2,4-6} `` — `title="..."` hiển thị tab tên file; `{2,4-6}` nhấn
+  các dòng quan trọng.
+- `` ```lang title="..." frame="terminal" `` — dùng cho terminal/console output.
+- `` ```lang title="..." ins={n} del={m} `` — dùng cho diff thêm/xóa dòng khi cần thể hiện rõ sự khác
+  biệt giữa hai phiên bản code (xem thêm B.5.2).
+
+Fenced code block thuần, không kèm meta string, chỉ dùng cho snippet ngắn không cần các tính năng trên.
+
+### B.5.2 Trình bày Anti-pattern và Fix
+
+Khi minh họa **Anti-pattern** (lấy từ mục 3.1 Template PHẦN A) và **Fix** cho cùng một đoạn code:
+
+- **Ưu tiên đặt trong cùng một fenced code block** thay vì tách thành hai block riêng, nếu:
+  - Hai phiên bản khác nhau dưới khoảng 20–30% số dòng.
+  - Mục tiêu chính là để người đọc so sánh nhanh sự khác biệt.
+- Chỉ dùng line highlight (`{3-4,14-15}`...) để nhấn mạnh **các dòng khác nhau**; không highlight toàn
+  bộ phần thân giống nhau giữa hai phiên bản.
+- Chèn comment `// ❌ Anti-pattern` và `// ✅ Fix` để phân tách rõ hai phần trong cùng block. Ký hiệu
+  ❌/✅ ở đây là dấu hiệu ngữ nghĩa kỹ thuật trong comment code, được miễn trừ khỏi quy tắc "không dùng
+  emoji" áp dụng cho phần nội dung hiển thị/UI của trang (xem B.8, mục 18).
+- Sau block code, nếu có ví dụ chạy thể hiện sự khác biệt về hành vi, bổ sung ngay bên dưới.
+- **Chỉ tách thành hai code block riêng** khi:
+  - Hai phiên bản khác nhau đáng kể (trên 20–30% số dòng), hoặc
+  - Cần đặt trong `<Tabs>` để so sánh song song, hoặc
+  - Cần dùng diff (`ins=`/`del=`) của Expressive Code để đánh dấu chính xác từng dòng thêm/xóa.
+
+Nguyên tắc highlight: chỉ highlight **dòng thể hiện nguyên nhân của lỗi** (ví dụ `var` → `let`,
+`var` → `const`). Không highlight các dòng giống nhau giữa hai phiên bản (như `return`,
+`console.log`...) vì chúng không giúp người đọc nhận ra điểm khác biệt.
+
+
+**Quy tắc chọn dòng highlight (bắt buộc):**
+
+Chỉ thêm `title="..." {line}` khi block code có **giá trị sư phạm**, tức là người đọc cần biết **nhìn vào đâu**. Không highlight mọi block code.
+
+ **BẮT BUỘC highlight** khi thuộc một trong các trường hợp:
+
+ * Anti-pattern ↔ Fix.
+ * Có bug production hoặc pitfall cần debug.
+ * Có dòng tạo ra hành vi khác biệt (`var` → `let`, regular function → arrow, `call/apply/bind`, `new`, dependency array, `await`, `return`, `throw`, `useMemo`, `memo`, `key`,...).
+ * Có dòng thể hiện nguyên nhân gốc (root cause) của bug.
+ * Có dòng thể hiện điểm quyết định (decision point) trong ví dụ.
+
+ **KHÔNG highlight** khi:
+
+ * Chỉ là ví dụ cú pháp thông thường.
+ * Code dùng để minh họa API cơ bản.
+ * Boilerplate, setup, import, export, khai báo thông thường.
+ * Toàn bộ block đều quan trọng như nhau.
+
+ **Quy tắc highlight:**
+
+ * Chỉ highlight **dòng gây khác biệt**, không highlight phần giống nhau.
+ * Nếu bug nằm trong callback hoặc closure thì highlight **toàn bộ callback**.
+ * Nếu bug do binding/scope thì highlight **toàn bộ phạm vi tạo binding** (function, loop, callback...), không chỉ đúng một dòng.
+ * Nếu cần trên khoảng 40% số dòng của block thì **không highlight**, vì lúc đó block đã không còn điểm nhấn nữa.
+
+ **Mục tiêu:** Highlight phải giúp người đọc trả lời ngay câu hỏi **"Nhìn vào đâu để hiểu bài?"**, không phải **"Tô màu càng nhiều càng tốt."**
+
+Quy tắc này sẽ khiến các ví dụ như `this`, `closure`, `hoisting`, `TDZ`, `React hook`, `async`,... đều được highlight đúng trọng tâm, còn các ví dụ syntax thông thường sẽ không có highlight.
+
+Ví dụ áp dụng:
+
+```js title="debug-hoisting.js" {3-4,14-15}
+// ❌ Anti-pattern
+function setupValidators() {
+  var validators = [];
+  for (var i = 0; i < 3; i++) {
+    validators.push(function () {
+      return i;
+    });
+  }
+  return validators;
+}
+
+// ✅ Fix
+function setupValidatorsFixed() {
+  const validators = [];
+  for (let i = 0; i < 3; i++) {
+    validators.push(function () {
+      return i;
+    });
+  }
+  return validators;
+}
+```
+
+### B.5.3 Escape ký tự đặc biệt trong inline `<code>`
+
+Trong JSX/MDX, dấu `{` và `}` bên trong `<code>` inline dễ bị parser hiểu nhầm là JSX expression
+`{...}`. Ví dụ với `fn: () => this`, dấu `:` xuất hiện trong "expression" khiến parser crash.
+
+Cách xử lý: bọc nội dung `<code>` trong template literal — `` {`fn: () => this`} `` — thay vì viết
+trực tiếp.
+
+### B.5.4 `<pre><code>`
+
+Dùng khi output hoặc stack trace lồng sâu bên trong card khiến fenced code block gây lỗi parse. Vẫn
+áp dụng nguyên tắc không style inline như mọi nơi khác trong hệ thống.
+
+---
+
+## B.6. CSS classes dùng sẵn
+
+| Class | Hiệu ứng | Dùng khi |
+|---|---|---|
+| `modern-card` | Card nền theo token (tự đổi dark/light), bo góc 12px, hover lift | Block nội dung độc lập cần tách biệt |
+| `modern-card accent-fe` | Border-left xanh dương | Frontend / JS / React / TypeScript / Engine |
+| `modern-card accent-be` | Border-left xanh lá | Backend / DB / API |
+| `modern-card accent-ops` | Border-left vàng cam | DevOps / Cloud / CI/CD / Session State |
+| `modern-card accent-info` | Border-left theo `--sl-color-accent` (tự đổi theo theme) | Định hướng / Khái niệm chung / Tóm tắt / Mục tiêu |
+| `modern-card accent-danger` | Border-left đỏ | Anti-pattern / War Story / Cảnh báo nghiêm trọng |
+| `callout-quote` | Gradient text, nổi bật | Quote kết bài |
+| `branch-table` | Header styled màu accent | Bảng so sánh 2 lựa chọn |
+| `section-title` / `section-subtitle` | Gradient text / text phụ | Trang chủ |
+| `mt-sm` | Margin-top nhỏ | Khoảng cách trong card |
+| `flex-wrap-badges` | Flex wrap cho badges | Nhiều `<Badge>` liên tiếp |
+| `dense-grid` | `display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1rem` | Đặt 2+ `modern-card` cạnh nhau; tự xuống 1 cột trên mobile không cần media query thủ công |
+
+---
+
+## B.7. Bố cục nhiều card cạnh nhau
+
+Khi cần đặt 2 hoặc nhiều `modern-card` cạnh nhau (ví dụ so sánh 2 accent), bọc ngoài bằng
+`<div class="dense-grid">`. **Không** dùng `<CardGrid>` cho mục đích này vì `<CardGrid>` chỉ nhận
+`<LinkCard>`/`<Card>` làm con trực tiếp.
+
+---
+
+## B.8. Quy tắc bắt buộc — checklist tổng hợp
+
+Danh sách dưới đây tổng hợp toàn bộ ràng buộc xuyên suốt hệ thống, dùng để tự kiểm tra ở bước cuối cùng
+của quy trình xử lý (B.9, Bước 4):
+
+1. Mọi file đầu ra là `.mdx`; không dùng `.md`.
+2. Cấm tuyệt đối inline style dưới mọi hình thức: `style=""`, `style={{}}`, hoặc thuộc tính `style`
+   trên bất kỳ tag nào.
+3. Không hardcode hex màu trong file MDX. Accent mới phải khai báo biến trong `custom.css` trước; MDX
+   chỉ gắn `class`.
+4. Tối đa 1 `modern-card` ở trạng thái mở liên tiếp mỗi 2 section; ưu tiên xen kẽ `<Aside>`, `<table>`,
+   `<Tabs>` để tạo nhịp thị giác.
+5. Section Verify / AI Checklist / Session State có nội dung dài (>5 dòng hoặc >5 item) phải bọc trong
+   `<details><summary>`.
+6. Prose giải thích dài (Input/Process/Output) nằm ngoài card; chỉ bọc trong card phần cần tách biệt
+   (bảng, code, cảnh báo).
+7. `<FileTree>` ưu tiên hơn liệt kê path rời rạc bằng `<code>` khi minh họa vị trí file trong repo.
+8. Filename tab / highlight dòng / diff sai-đúng / terminal output dùng fenced code block kèm
+   Expressive Code meta string; không dùng component `<Code>` (crash vì không nhận children).
+9. Anti-pattern và Fix có cấu trúc gần giống nhau (chênh lệch dưới ~20–30% số dòng) gộp chung 1 fenced
+   block, chỉ highlight dòng khác biệt; tách 2 block riêng hoặc dùng `<Tabs>`/diff `ins=`/`del=` khi
+   chênh lệch lớn hơn hoặc cần so sánh song song.
+10. `syncKey` trong `<Tabs>` dùng chung cho các nhóm tab lặp lại cùng khái niệm trong bài; không dùng
+    cho tab nội dung độc lập (vd Self-check).
+11. `<CardGrid>` chỉ nhận `<LinkCard>`/`<Card>` làm con trực tiếp; card đặt cạnh nhau dùng
+    `<div class="dense-grid">`.
+12. `<Aside>` chỉ có 3 variant hợp lệ: `tip`, `caution`, `danger` — không dùng `type="note"`.
+13. `<Badge>` có 4 variant: `success`, `note`, `caution`, `danger`; nhiều badge liên tiếp bọc trong
+    `<span class="flex-wrap-badges">`.
+14. `<Steps>` bọc `<ol>`, mỗi bước là một `<li>`, cho phép nested `<ul>` làm checklist con.
+15. Inline `<code>` chứa ký tự đặc biệt (`{`, `}`, `:`...) phải bọc trong template literal
+    `` {`...`} `` để tránh parser MDX/JSX crash.
+16. `<pre><code>` chỉ dùng khi fenced block gây lỗi parse với output/stack trace lồng sâu trong card;
+    vẫn không được style inline.
+17. `sidebar.badge` trong frontmatter (khi có Session State) phải đồng bộ variant với trạng thái thực
+    tế trong card Session State ở cuối bài.
+18. Không dùng emoji trong nội dung hiển thị/UI của trang, ngoại trừ ký hiệu `❌`/`✅` dùng trong
+    comment code để đánh dấu Anti-pattern/Fix theo B.5.2 — đây là dấu hiệu ngữ nghĩa kỹ thuật, không
+    tính là emoji trang trí.
+19. Không dùng heading `#` (H1) trong phần thân bài; frontmatter `title` đã đóng vai trò H1.
+20. Giữ nguyên 100% thông tin kỹ thuật từ nội dung PHẦN A vừa sinh ra; chỉ được rút gọn văn xuôi dài
+    thành bullet points, không được tự ý chỉnh sửa hoặc lược bỏ nội dung kỹ thuật.
+21. Nếu nội dung PHẦN A có khối `---SESSION STATE---`, chuyển thành card Session State và đồng bộ
+    `sidebar.badge` tương ứng.
+22. Output cuối cùng chỉ là nội dung file `.mdx` hoàn chỉnh, hợp lệ (valid MDX syntax), không kèm giải
+    thích, không bọc trong markdown code fence bao ngoài, và **không hiển thị lại nội dung thô của
+    PHẦN A** trước đó.
+
+---
+
+## B.9. Quy trình chuyển nội dung PHẦN A sang MDX hoàn chỉnh
+
+**Bước 0 — Rà soát mật độ tổng thể:** đếm số section dự kiến dùng `modern-card` ở trạng thái mở. Nếu
+tỷ lệ vượt quá 50% tổng số section, lập kế hoạch chuyển bớt sang `<Aside>`/`<table>`/`<details>` ngay
+từ đầu, tránh phải sửa lại toàn bộ ở bước cuối.
+
+**Bước 1 — Phân tích nội dung vừa sinh ở PHẦN A:** xác định chủ đề chính, danh sách section theo Template
+(mục A.2), có khối Session State hay không; với mỗi phần nội dung, xác định đây là quy trình / so sánh /
+cảnh báo / code / bảng dữ liệu / cấu trúc thư mục / diff anti-pattern.
+
+**Bước 2 — Chẩn đoán vi phạm:** kiểm tra có card nào lặp liên tiếp vi phạm giới hạn mật độ (mục 4,
+B.8) không; kiểm tra có hex màu viết trực tiếp thay vì dùng class không.
+
+**Bước 3 — Mapping sang UI:** đối chiếu từng phần nội dung với Phụ lục B "Bảng tra cứu nhanh" để chọn
+đúng component cho từng loại nội dung.
+
+**Bước 4 — Viết file MDX hoàn chỉnh**, sau đó tự kiểm tra theo toàn bộ 22 mục tại B.8 trước khi trả kết
+quả cho user. Đây là bước cuối cùng của toàn bộ quy trình 2 giai đoạn (PHẦN A → PHẦN B) — chỉ nội dung
+của bước này mới được xuất ra.
+
+---
+
+## B.10. Cấu trúc output mẫu
+
+Khung tham chiếu cho một file bài giảng hoàn chỉnh, thể hiện cách áp dụng đồng thời các mục ở trên:
+
+````mdx
+---
+title: 02 JS Core Engine Deep Dive
+description: Cơ chế hoisting, TDZ và scope chain trong JavaScript engine.
+sidebar:
+  order: 17
+  badge:
+    text: Đang học
+    variant: caution
+---
+
+import { Steps, Tabs, TabItem, CardGrid, LinkCard, Aside, Badge, Icon, FileTree } from '@astrojs/starlight/components';
+
+<div class="modern-card accent-info">
+  <h3>
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">...</svg>
+    Tóm tắt
+  </h3>
+  <p>[Mục tiêu bài học + thời gian ước tính]</p>
+  <p><strong>Project liên quan:</strong> <Badge text="P6" variant="note" /> <Badge text="P1" variant="note" /></p>
+</div>
+
+## 0. Vấn đề thực tế
+
+<Aside type="danger" title="Câu hỏi đau đầu của Mid-level">
+  "..."
+</Aside>
+
+<FileTree>
+
+</FileTree>
+
+## 1. Mục tiêu bài học
+
+<div class="modern-card accent-info">
+  <h3>...</h3>
+  <ul>...</ul>
+</div>
+
+## 2. Tài liệu đọc đầu vào
+
+<CardGrid>
+  <LinkCard title="..." href="..." description="..." />
+  <LinkCard title="..." href="..." description="..." />
+</CardGrid>
+
+## 3. Process — Cơ chế Engine
+
+Đoạn văn giải thích ngắn nằm ngoài card (prose thường, không bọc mọi thứ vào div).
+
+### 3.1. [Subsection]
+
+```ts title="engine.ts" {3,5}
+// code với dòng 3, 5 được nhấn mạnh
+```
+
+<Tabs syncKey="declare-type">
+  <TabItem label="var">...</TabItem>
+  <TabItem label="let">...</TabItem>
+  <TabItem label="const">...</TabItem>
+</Tabs>
+
+```ts title="anti-pattern.ts" {2}
+// ❌ dòng 2: cách sai (highlight để chú ý)
+// ✅ dòng 3: cách đúng
+```
+
+## 4. Output — Artifact phải hoàn thành
+
+<Steps>
+  <ol>
+    <li><strong>Artifact 1</strong><p>...</p></li>
+    <li><strong>Artifact 2</strong><p>...</p></li>
+  </ol>
+</Steps>
+
+## 5. Verify — Kiểm tra
+
+### Feynman Technique
+
+<div class="modern-card accent-info">
+  <h3>...</h3>
+  <p><em>"..."</em></p>
+</div>
+
+### Self-check (câu hỏi phỏng vấn)
+
+<Tabs>
+  <TabItem label="Câu 1"><p><strong>"..."</strong></p></TabItem>
+  <TabItem label="Câu 2"><p><strong>"..."</strong></p></TabItem>
+  <TabItem label="Câu 3"><p><strong>"..."</strong></p></TabItem>
+</Tabs>
+
+<Aside type="tip" title="Integration Check">
+  Kiến thức này nhúng vào <strong>P6</strong> và <strong>P1</strong> theo <strong>Loại A</strong>.
+</Aside>
+
+## 6. Homework / Mini-Exercise (Loại B)
+
+<Steps>
+  <ol>
+    <li><strong>Exercise 1</strong><p>...</p></li>
+  </ol>
+</Steps>
+
+## 7. War Story
+
+<div class="modern-card accent-danger">
+  <h3>...</h3>
+  <p><strong>Bối cảnh:</strong>...</p>
+  <p><strong>Quyết định:</strong>...</p>
+  <p><strong>Trade-off:</strong>...</p>
+  <p><strong>Bài học:</strong> <strong>...</strong></p>
+</div>
+
+## 8. AI Verify Checklist
+
+<div class="modern-card accent-ops">
+  <h3>...</h3>
+  <details>
+    <summary>Xem chi tiết checklist</summary>
+    <ul>
+      <li><strong>...</strong> AI có ...? → <strong>Sai.</strong> ...</li>
+    </ul>
+  </details>
+</div>
+
+## 9. Liên kết & Tiếp theo
+
+<LinkCard title="..." href="..." description="..." />
+
+---
+
+<div class="modern-card accent-ops">
+  <h3>
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+    Trạng thái Buổi Học
+  </h3>
+  <details>
+    <summary>Xem chi tiết trạng thái</summary>
+    <table>
+      <tbody>
+        <tr><td>Current File</td><td><code>02-js-core-engine.mdx</code></td></tr>
+        <tr><td>Day In File</td><td><strong>1 / 4</strong></td></tr>
+        <tr><td>Total Days Completed</td><td><strong>2</strong></td></tr>
+        <tr><td>Completed Files</td><td><code>[01-goals-and-info.mdx]</code></td></tr>
+        <tr><td>Notes</td><td>...</td></tr>
+      </tbody>
+    </table>
+    <span class="flex-wrap-badges">
+      <Badge text="P1: not started" variant="danger" />
+      <Badge text="P2: not started" variant="danger" />
+    </span>
+  </details>
+  <p><strong>Next Topic</strong></p>
+  <p>Buổi 3: ...</p>
+</div>
+````
+
+---
+
+## B.11. Ràng buộc với nội dung nguồn (PHẦN A) và với output cuối cùng
+
+**Ràng buộc bắt buộc với nội dung vừa sinh ở PHẦN A (đóng vai trò "raw" trong quy trình cũ):**
+
+- Nội dung PHẦN A là nội dung sẽ được load vào hệ thống thật — **bắt buộc không được tự ý chỉnh sửa**
+  thông tin kỹ thuật bên trong khi chuyển sang MDX.
+- Giữ nguyên 100% thông tin kỹ thuật; chỉ được rút gọn văn xuôi dài thành bullet points.
+- Nếu nội dung PHẦN A có khối `---SESSION STATE---`, chuyển thành card Session State và đồng bộ
+  `sidebar.badge` tương ứng.
+
+**Ràng buộc bắt buộc với output:**
+
+- Chỉ trả về nội dung file `.mdx` hoàn chỉnh — không giải thích, không bọc trong markdown code fence
+  bao ngoài, không hiển thị lại nội dung thô của PHẦN A.
+- File phải chạy được ngay (valid MDX syntax).
+- Không dùng emoji trong nội dung hiển thị/UI (ngoại lệ duy nhất: ký hiệu `❌`/`✅` trong comment code
+  theo B.5.2).
+- Không style inline dưới bất kỳ hình thức nào, kể cả cho một giá trị hex accent duy nhất — chỉ dùng
+  class.
+- Không dùng heading `#` trong phần thân bài.
+- Không dùng `<Aside type="note">`.
+- Không quá 1 `modern-card` ở trạng thái mở liên tiếp mỗi 2 section.
+
+---
+
+## Phụ lục B — Bảng tra cứu nhanh theo nội dung bài giảng
+
+| Nội dung bài giảng | Component đúng | Ghi chú |
+|---|---|---|
+| Vị trí file trong project / cấu trúc thư mục | `<FileTree>` | Thay cho việc liệt kê path `<code>` rời rạc trong văn xuôi |
+| Code có nhiều dòng cần nhấn mạnh | Fenced block: `` ```js title="..." {2,4} `` | Dùng Expressive Code meta string `{2,4}` để highlight dòng |
+| Anti-pattern dạng diff sai/đúng, chênh lệch nhỏ | Một fenced block: `` ```js title="..." {3-4} `` + comment `❌`/`✅` | Xem B.5.2 |
+| Anti-pattern dạng diff sai/đúng, chênh lệch lớn | Hai fenced block riêng, hoặc `<Tabs>`, hoặc diff `ins=`/`del=` | Xem B.5.2 |
+| Terminal / console output | Fenced block: `` ```js title="..." frame="terminal" `` | Hoặc `<pre><code>` trong card nếu fenced block gây lỗi parse |
+| 2+ `modern-card` đặt cạnh nhau | `<div class="dense-grid">` bọc ngoài | Không dùng `<CardGrid>` |
+| Tab lặp lại cùng khái niệm trong bài | `<Tabs syncKey="...">` | Không dùng `syncKey` cho tab nội dung độc lập |
+| Trạng thái buổi học trên sidebar | `sidebar.badge` trong frontmatter | Đồng bộ với card Session State cuối bài |
+
+---
+
+# PHẦN C — QUY TRÌNH TỔNG HỢP & LỆNH ĐIỀU KHIỂN CHO AI
+
+## C.1. Quy trình chạy 1 lượt duy nhất
+
+Khi user yêu cầu sinh 1 buổi học, AI thực hiện tuần tự **trong cùng 1 lượt trả lời**, không dừng lại
+giữa chừng để hỏi hay chờ user dán thêm gì:
+
+1. Chạy PHẦN A (mục 0.2 → A.1 → A.2 → tự kiểm tra A.3) để sinh nội dung sư phạm đầy đủ theo Template.
+2. Ngay khi nội dung PHẦN A đạt checklist A.3, chuyển sang chạy PHẦN B (B.9, Bước 0 → Bước 4) để biến
+   nội dung đó thành file `.mdx` hoàn chỉnh theo design system.
+3. Tự kiểm tra output cuối theo 22 mục ở B.8 và các ràng buộc ở B.11.
+4. **Chỉ xuất ra kết quả cuối cùng của bước 3** — là 1 file `.mdx` hoàn chỉnh, sạch, đúng chuẩn — không
+   hiển thị nội dung trung gian của PHẦN A, không kèm giải thích quy trình.
+
+## C.2. Lệnh điều khiển
+
+Khi user paste `01_CHAPTER_1_FRONTEND_MASTER.txt` + file này và gõ một trong các lệnh sau, AI phải hiểu
+và xử lý đúng:
+
+### C.2.1. "Soạn file [tên file .mdx], buổi [X]/[Y]"
+→ Kiểm tra file đó trong **Curriculum Map (PHẦN 9 Master)**. Kiểm tra X hợp lệ (1 ≤ X ≤ Y). Chạy quy
+trình C.1 đầy đủ: sinh nội dung theo **Template (A.2)** với đầy đủ 9 mục — kèm AI Verify Checklist và
+Session State — rồi chuyển ngay sang **PHẦN B** để xuất ra file `.mdx` hoàn chỉnh, không xuất bước
+trung gian. Mỗi lần generate **chỉ 1 buổi**. Nếu buổi hiện tại là lý thuyết nền, phải chỉ rõ nó sẽ được
+**nhúng vào project nào** (mục A.4). Mỗi file `.mdx` cần có phần SEO Astro (frontmatter) ở đầu file
+theo B.3. **Trước khi xuất, bắt buộc tự chạy qua CHECKLIST CHẤT LƯỢNG NỘI DUNG (A.3) A→F, sau đó
+CHECKLIST ĐỊNH DẠNG (B.8) 1→22; nếu có mục fail ở checklist nào, tự sửa nội dung rồi mới xuất, không
+xuất bản nháp chưa đạt.**
+
+### C.2.2. "Nhảy sang file [tên file .mdx]"
+→ Cập nhật `Completed_Files` nếu file cũ đã xong. Chuyển `Current_File` sang file mới. Reset
+`Day_In_Current_File = 1`. Chạy quy trình C.1 để sinh buổi 1 của file mới, xuất ra dạng `.mdx` hoàn
+chỉnh theo PHẦN B.
+
+### C.2.3. "Soạn project [P1–P6]"
+→ Project không phải file `.mdx` riêng lẻ mà được xen kẽ vào các buổi học. Hỏi user muốn focus vào
+kiến thức nào của project đó (tra PHẦN 8 Master), hoặc đề xuất task Loại A cần nhúng vào project đó.
+Nếu user chốt nội dung cụ thể, áp dụng quy trình C.1 để xuất ra `.mdx` hoàn chỉnh.
+
+### C.2.4. "Ôn tập" / "Review"
+→ Dựa vào Session State, tổng hợp các kiến thức đã học và đề xuất ôn tập theo Feynman Technique hoặc
+Mini-Exercise chưa pass. Nếu user muốn xuất thành tài liệu, áp dụng PHẦN B để định dạng.
+
+### C.2.5. "Viết thêm vào prompt" / "Update quy tắc sinh bài"
+→ User muốn bổ sung/sửa đổi **quy tắc trong file này** (PHẦN A, B hoặc C) — KHÔNG phải nội dung kiến
+thức, Curriculum Map, hay Project (những thứ đó thuộc Master file, phải sửa ở Master file, không trộn
+vào đây). Đọc nội dung user cung cấp, xác định thuộc PHẦN A (nội dung sư phạm) hay PHẦN B (định dạng
+UI/UX), merge vào đúng mục tương ứng, giữ nguyên cấu trúc và numbering. Output file mới đã merge.
+
+---
+
+Viết Ngày X: [Title file]
+Đọc context 01_CHAPTER_1_FRONTEND_MASTER.txt
+Tuân thủ PHẦN A + PHẦN B + PHẦN C của prompt-chapter1-daily.txt (file này)
+Output: file `.mdx` hoàn chỉnh, đúng chuẩn UI/UX ngay từ 1 lần chạy — không cần bước làm đẹp riêng.
+
+**END OF PROMPT**

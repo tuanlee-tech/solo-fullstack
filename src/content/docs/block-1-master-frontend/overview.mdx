@@ -1,0 +1,262 @@
+---
+title: "Master Frontend"
+description: Khối 1 của lộ trình Solo Fullstack. Xây nền tảng frontend vững chắc để sẵn sàng phỏng vấn Senior FE (30–45 triệu) — nền tảng bắt buộc cho cả 2 nhánh sự nghiệp.
+sidebar:
+  order: 1
+  badge:
+    text: Đang học
+    variant: caution
+---
+
+import { Steps, Tabs, TabItem, CardGrid, LinkCard, Aside, Badge, Icon, FileTree } from '@astrojs/starlight/components';
+
+<div class="modern-card accent-info">
+  <h3>
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+    Tóm tắt
+  </h3>
+  <p><strong>Mục tiêu:</strong> Đạt nền tảng kỹ thuật đủ để <strong>pass vòng phỏng vấn Senior FE</strong> (30–45 triệu, hoặc freelance $30–50/hour) — <em>không phải "trở thành Senior" theo đúng nghĩa</em>.</p>
+  <p><strong>Thời gian ước tính:</strong> 3–6 tháng (học song song với đi làm nếu đã có việc). Đây là thời gian để <em>sẵn sàng phỏng vấn</em>, không phải để có đủ kinh nghiệm senior thật.</p>
+  <p><strong>Thuộc:</strong> Khối Lõi Chung — <strong>bắt buộc cho cả 2 nhánh</strong> (Staff/Architect và Solo Founder).</p>
+  <p><strong>Milestone:</strong> Portfolio 4–6 project production-ready, trả lời được mọi câu hỏi phỏng vấn Senior FE (bao gồm <strong>Frontend System Design</strong>), hiểu bảo mật frontend cơ bản, biết cách <strong>verify code do AI tạo ra</strong>.</p>
+  <p><strong>Project liên quan:</strong> <Badge text="P1" variant="note" /> <Badge text="P2" variant="note" /> <Badge text="P3" variant="note" /> <Badge text="P4" variant="note" /> <Badge text="P5" variant="note" /> <Badge text="P6" variant="note" /></p>
+</div>
+
+## 0. Vấn đề thực tế
+
+<Aside type="danger" title="Câu hỏi đau đầu của mid-level">
+  "Tôi biết React, biết Hooks, biết Tailwind — nhưng tại sao vẫn fail phỏng vấn Senior? Tôi thiếu gì so với ngườii được offer 45 triệu?"
+</Aside>
+
+
+
+## 1. Mục tiêu bài học
+
+<div class="modern-card accent-info">
+  <h3>Sau chặn này, bạn phải</h3>
+  <ul>
+    <li>Giải thích được <strong>Event Loop</strong>, <strong>React Fiber</strong>, <strong>Next.js Caching Strategy</strong> cho ngườii khác hiểu</li>
+    <li>Giải thích được <strong>Prototype chain</strong>, <strong>4 quy tắc <code>this</code></strong>, <strong>Execution Context</strong> và debug được code JS legacy</li>
+    <li>Live code được <strong>Modal, Dropdown, Data Table</strong> từ đầu (không copy shadcn) trong 30–45 phút</li>
+    <li>Viết <strong>TypeScript không dùng <code>any</code></strong>, tự viết Utility Types phức tạp (<code>Paths</code>, <code>DeepPartial</code>)</li>
+    <li>Biết <strong>cả Zustand lẫn Redux</strong> — hiểu trade-offs, có thể maintain codebase legacy</li>
+    <li>Optimize được <strong>Core Web Vitals</strong> (LCP, INP, CLS) và đọc Lighthouse report</li>
+    <li>Tối ưu được <strong>Web thuần</strong> không dùng Next.js (CRP, HTTP caching, font subsetting, image srcset)</li>
+    <li>Viết <strong>Unit test (Vitest)</strong> và <strong>E2E test (Playwright)</strong> cho critical flows</li>
+    <li>Deploy được <strong>PWA</strong> với offline capability, push notification</li>
+    <li>Có <strong>6 project production-ready</strong> trên GitHub với CI/CD, test, monitoring</li>
+    <li>Làm được <strong>1 vòng Frontend System Design hoàn chỉnh</strong> theo RADIO framework — đây là vòng phỏng vấn <strong>riêng biệt</strong>, phân biệt senior rõ nhất</li>
+    <li>Giải thích được rủi ro bảo mật frontend: <strong>XSS, CSRF, CSP, supply chain</strong></li>
+    <li>Xử lý được <strong>Error Boundary</strong> và thiết kế <strong>graceful degradation</strong></li>
+    <li>Biết cách <strong>verify code do AI agent tạo ra</strong> — nhận diện chỗ AI sai tinh vi</li>
+    <li>Làm được ít nhất 1 lần: <strong>review PR có tính xây dựng</strong>, <strong>viết 1 ADR</strong> giải thích trade-off</li>
+    <li>Xử lý được <strong>Git conflict</strong> nghiêm trọng, <strong>cherry-pick hotfix</strong>, cứu commit mất bằng <code>reflog</code></li>
+  </ul>
+</div>
+
+<Aside type="caution" title="Điều roadmap KHÔNG thể cho bạn">
+  Kinh nghiệm xử lý incident production lúc 2 giờ sáng, cảm giác đánh đổi giữa deadline và chất lượng dưới áp lực thật từ PM, và sự tin tưởng của một team dành cho bạn qua thờii gian. Đây là phần bạn chỉ tích lũy được khi đi làm — không có shortcut.
+</Aside>
+
+## 2. Lộ trình đề xuất (6 tháng)
+
+<Steps>
+  <ol>
+    <li>
+      <strong>Tháng 1: Nền tảng Core + Project 1 (Landing + Blog)</strong>
+      <ul>
+        <li>JS/TS Engine + JS Core + Build Tool + Package Manager</li>
+        <li>Git Teamwork</li>
+        <li>Next.js App Router + Tailwind + shadcn/ui</li>
+        <li>SEO + MDX Blog + i18n</li>
+        <li>Zod + Server Actions + Deploy</li>
+      </ul>
+    </li>
+    <li>
+      <strong>Tháng 2: React/Next.js Deep Dive + Project 2 (E-commerce)</strong>
+      <ul>
+        <li>React Fiber + Re-render Optimization</li>
+        <li>Framework Evolution + Error Handling + Form Engineering</li>
+        <li>TanStack Query + Zustand + XState</li>
+        <li>Stripe integration + PWA</li>
+      </ul>
+    </li>
+    <li>
+      <strong>Tháng 3: State Management Nâng cao + Project 3 (Dashboard)</strong>
+      <ul>
+        <li>Redux Ecosystem (RTK, Saga, RTK Query)</li>
+        <li>Data Viz (Recharts) + Virtual Scroll + Web Workers</li>
+        <li>Monorepo (Turborepo) + Storybook + Chromatic</li>
+        <li>BFF Pattern + Real-time (SSE)</li>
+      </ul>
+    </li>
+    <li>
+      <strong>Tháng 4: Advanced + Project 4 (Social Feed)</strong>
+      <ul>
+        <li>Micro-frontends + WebSockets (Socket.io)</li>
+        <li>Animation (Framer Motion) + CSS Modern</li>
+        <li>Web APIs & Storage + SEO Technical</li>
+        <li>AI Coding Agent workflow</li>
+      </ul>
+    </li>
+    <li>
+      <strong>Tháng 5: UI Engineering + Project 5 (Design System)</strong>
+      <ul>
+        <li>Design Tokens + Component Library từ đầu</li>
+        <li>Accessibility (WCAG 2.1 AA) + Design System</li>
+        <li>Animation & Micro-interactions</li>
+        <li>War Stories Practice</li>
+      </ul>
+    </li>
+    <li>
+      <strong>Tháng 6: System Design + Bảo mật + Legacy + Tổng hợp Portfolio + Apply</strong>
+      <ul>
+        <li>Frontend System Design (RADIO framework)</li>
+        <li>Bảo mật Frontend + Production Ops</li>
+        <li>Legacy Migration (Strangler Fig)</li>
+        <li>Portfolio + Apply Job</li>
+      </ul>
+    </li>
+  </ol>
+</Steps>
+
+<Aside type="tip" title="Điều chỉnh thực tế">
+  Lộ trình 6 tháng đưa bạn đến trạng thái <strong>"sẵn sàng phỏng vấn Senior"</strong>, không phải "là Senior". Nên bắt đầu luyện <strong>Frontend System Design</strong> song song từ <strong>Tháng 3</strong> — đây là kỹ năng cần lặp lại nhiều lần (giống luyện thuật toán) chứ không học một lần là xong. Nếu timeline bị trễ, ưu tiên cắt ecosystem phụ (Micro-frontends, PWA, Data Viz) trước khi cắt System Design hoặc Security.
+</Aside>
+
+## 3. Danh mục kiến thức chính
+
+<div class="dense-grid">
+  <div class="modern-card accent-fe">
+    <h3>JS/TS Core & Engine</h3>
+    <ul>
+      <li>Execution Context, Hoisting, Scope Chain, Closure</li>
+      <li><code>this</code> binding — 4 quy tắc</li>
+      <li>Prototype Chain, Class modern, Proxy & Reflect</li>
+      <li>V8 Engine (Ignition → TurboFan), Event Loop, GC</li>
+      <li>TypeScript: Generics, Utility Types, Zod Runtime Validation</li>
+    </ul>
+  </div>
+  <div class="modern-card accent-fe">
+    <h3>Build Tool & Package Manager</h3>
+    <ul>
+      <li>Webpack vs Vite vs Rspack — trade-offs</li>
+      <li>Tree-shaking, Code Splitting, Bundle Analysis</li>
+      <li>pnpm, Lockfile, Peer Dependencies, Monorepo Protocol</li>
+      <li>Security: audit, lockfile poisoning, dependency confusion</li>
+    </ul>
+  </div>
+  <div class="modern-card accent-fe">
+    <h3>React & Next.js</h3>
+    <ul>
+      <li>Fiber Architecture, Reconciliation, Diffing</li>
+      <li>Re-render Optimization (Profiler, memo, callback)</li>
+      <li>App Router: SC vs CC, RSC Serialization, <code>use()</code></li>
+      <li>Caching Strategy (4 loại), Server Actions</li>
+      <li>Framework Evolution: Class → Hooks → 19, Pages → App Router → v16</li>
+    </ul>
+  </div>
+  <div class="modern-card accent-fe">
+    <h3>State Management</h3>
+    <ul>
+      <li>TanStack Query: cache, optimistic update, infinite scroll</li>
+      <li>Zustand: slices, middleware, persist</li>
+      <li>Redux Toolkit: configureStore, createSlice, RTK Query</li>
+      <li>Redux Saga: effects, watchers, cancellation</li>
+      <li>XState: workflow phức tạp (checkout, wizard)</li>
+    </ul>
+  </div>
+  <div class="modern-card accent-fe">
+    <h3>Form & Error Handling</h3>
+    <ul>
+      <li>react-hook-form + Zod: validation schema, field arrays</li>
+      <li>Auto-save draft, optimistic form, dirty state tracking</li>
+      <li>Error Boundary, Graceful Degradation, Retry Pattern</li>
+      <li>Hydration Mismatch, Circuit Breaker cơ bản</li>
+    </ul>
+  </div>
+  <div class="modern-card accent-fe">
+    <h3>UI/UX Engineering</h3>
+    <ul>
+      <li>Tailwind Deep Dive, shadcn/ui, Component Library từ đầu</li>
+      <li>Design Tokens, CSS Modern (@layer, Container Queries, :has())</li>
+      <li>Accessibility: WCAG 2.1 AA, ARIA, Keyboard Nav</li>
+      <li>Animation: CSS Transitions, Framer Motion, 60fps</li>
+    </ul>
+  </div>
+  <div class="modern-card accent-fe">
+    <h3>Testing & Performance</h3>
+    <ul>
+      <li>Vitest + Testing Library (behavior, not implementation)</li>
+      <li>Playwright E2E: cross-browser, visual regression</li>
+      <li>MSW: mock API cho dev + test</li>
+      <li>Core Web Vitals (LCP/INP/CLS), Lighthouse CI</li>
+      <li>LoAF API, Performance Budget, Bundle Analysis</li>
+    </ul>
+  </div>
+  <div class="modern-card accent-fe">
+    <h3>Web Thuần & Ecosystem</h3>
+    <ul>
+      <li>Critical Rendering Path, HTTP Caching, DevTools</li>
+      <li>Font/Image/Video Optimization (srcset, AVIF, subsetting)</li>
+      <li>Web APIs: IndexedDB, Observers, Broadcast Channel</li>
+      <li>PWA, i18n, Micro-frontends, Monorepo (Turborepo)</li>
+      <li>SEO Technical: JSON-LD, GEO, Dynamic Meta</li>
+    </ul>
+  </div>
+  <div class="modern-card accent-fe">
+    <h3>System Design & Bảo mật</h3>
+    <ul>
+      <li>RADIO Framework: Requirements → Architecture → Data → Interface → Optimizations</li>
+      <li>Rendering Strategy: CSR/SSR/SSG/ISR/RSC — khi nào dùng cái nào</li>
+      <li>XSS, CSRF, CSP, CORS, OAuth/JWT</li>
+      <li>Supply Chain Security, Server Actions Authorization</li>
+      <li>BFF Pattern, Production Ops (Sentry, Feature Flags)</li>
+    </ul>
+  </div>
+  <div class="modern-card accent-fe">
+    <h3>Git & AI Agent</h3>
+    <ul>
+      <li>Rebase vs Merge, Conflict Resolution, Cherry-pick</li>
+      <li>Reflog, Bisect, Interactive Rebase</li>
+      <li>Git Teamwork, Monorepo Commit Scope</li>
+      <li>Claude Code / Cursor: giao task đa bước</li>
+      <li>Verify AI output: edge case, a11y, error handling, security</li>
+    </ul>
+  </div>
+  <div class="modern-card accent-fe">
+    <h3>Judgment & War Stories</h3>
+    <ul>
+      <li>Trade-off dưới ambiguity, Code Review, Mentoring</li>
+      <li>ADR (Architecture Decision Record)</li>
+      <li>PM ép Deadline, BE API sai Shape</li>
+      <li>Main Thread Block 10K Items, Code Review Bất Đồng</li>
+      <li>AI Agent Tạo Code "Gần Đúng", Incident 2 Giờ Sáng</li>
+    </ul>
+  </div>
+  <div class="modern-card accent-fe">
+    <h3>6 Projects Production-Ready</h3>
+    <ul>
+      <li><strong>P1:</strong> SaaS Landing + Blog + Newsletter</li>
+      <li><strong>P2:</strong> E-commerce Checkout Flow</li>
+      <li><strong>P3:</strong> Admin Dashboard (Enterprise Analytics)</li>
+      <li><strong>P4:</strong> Real-time Social Feed</li>
+      <li><strong>P5:</strong> Design System + Component Library</li>
+      <li><strong>P6:</strong> Legacy Migration (jQuery → React)</li>
+    </ul>
+  </div>
+</div>
+
+
+
+## 4. Tài liệu đọc đầu vào
+
+<CardGrid>
+  <LinkCard title="You Don't Know JS — Kyle Simpson" href="https://github.com/getify/You-Dont-Know-JS" description="Hiểu JS thực sự: Scope & Closures, this & Object Prototypes, Async & Performance." />
+  <LinkCard title="Effective TypeScript — Dan Vanderkam" href="https://effectivetypescript.com/" description="62 specific items — mỗi item là 1 lỗi hay gặp + cách fix." />
+  <LinkCard title="React Docs (Beta)" href="https://react.dev/" description="Official source, cập nhật nhất. Thinking in React, State Management, Escape Hatches." />
+  <LinkCard title="Next.js Documentation (App Router)" href="https://nextjs.org/docs" description="Routing, Data Fetching, Caching, Server Actions." />
+  <LinkCard title="Frontend Interview Handbook" href="https://www.frontendinterviewhandbook.com/" description="Khung RADIO và cách trả lờii Frontend System Design — bắt buộc đọc trước khi luyện đề." />
+  <LinkCard title="OWASP Top 10 + Cheat Sheets" href="https://owasp.org/www-project-top-ten/" description="Nguồn chuẩn ngành về bảo mật web." />
+</CardGrid>
+
