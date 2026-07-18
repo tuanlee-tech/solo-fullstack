@@ -1,0 +1,1649 @@
+# PHẦN 9: LỘ TRÌNH THỰC HIỆN CHI TIẾT (UPGRADED v1.1)
+
+> **Triết lý cốt lõi:** Không timeline cứng, không đếm ngày. Chỉ có **thứ tự module** và **Exit Criteria**. Tuân theo dependency: bạn không thể hiểu sâu React Fiber nếu chưa hiểu Browser Rendering Pipeline; không thể tối ưu Network nếu chưa hiểu HTTP/2 và TLS.  
+> Quy tắc duy nhất: **không sang module sau khi chưa đạt Exit Criteria module trước**.
+
+---
+
+## 9.0. CORE LOOP — VÒNG XOẮN ỐC VĨNH CỬU
+
+> Roadmap này không tuyến tính. Bạn không bao giờ "xong Stage 8".  
+> Đây là vòng lặp vĩnh cửu — mỗi vòng xoắn ốc đưa bạn lên cao hơn, nhìn rộng hơn, nhưng vẫn đi trên chính nền tảng đã xây.
+
+```
+                    ┌─────────────┐
+                    │  FOUNDATION │
+                    │ (Stage 0–1) │
+                    └──────┬──────┘
+                           │
+                           ▼
+                    ┌─────────────┐
+                    │   PROJECT   │
+                    │ (Stage 2–7) │
+                    └──────┬──────┘
+                           │
+                           ▼
+                    ┌─────────────┐
+                    │  PRODUCTION │
+                    │   (Deploy)  │
+                    └──────┬──────┘
+                           │
+                           ▼
+                    ┌─────────────┐
+                    │   INCIDENT  │
+                    │  (2 giờ sáng)│
+                    └──────┬──────┘
+                           │
+                           ▼
+                    ┌─────────────┐
+                    │   REFACTOR  │
+                    │  (ADR/Spiral)│
+                    └──────┬──────┘
+                           │
+                           ▼
+                    ┌─────────────┐
+                    │  TEACH BACK │
+                    │ (Blog/Mentor)│
+                    └──────┬──────┘
+                           │
+                           ▼
+                    ┌─────────────┐
+                    │ OPEN SOURCE │
+                    │ (Contribute) │
+                    └──────┬──────┘
+                           │
+                           └──────────────► FOUNDATION (lần 2)
+                                           (đọc lại YDKJS,
+                                            V8 blog, React source —
+                                            hiểu sâu hơn lần trước)
+```
+
+**Quy tắc áp dụng:**
+- Sau mỗi Project (Stage 2–7), bắt buộc viết ít nhất 1 ADR và 1 War Story trước khi sang Stage tiếp theo.
+- Sau Stage 8, quay lại Stage 0 với góc nhìn mới — lần này đọc source code thay vì tutorial.
+- Mỗi lần lặp lại Foundation, giảm thời gian Vòng 1 (Foundation) và tăng thời gian Vòng 3 (Mastery).
+
+---
+
+## 9.0.5. NGUYÊN TẮC HỌC SÂU (Áp dụng cho MỌI module)
+
+### A. Spiral Learning — 3 Vòng
+
+```
+VÒNG 1: FOUNDATION (Biết nó là gì)
+└── Đọc tài liệu gốc, viết code demo, hiểu cơ chế hoạt động
+
+VÒNG 2: APPLICATION (Biết dùng nó trong thực tế)
+└── Áp dụng vào project, xử lý edge case, đọc source code thư viện
+
+VÒNG 3: MASTERY (Biết tại sao nó thiết kế như vậy)
+└── Re-implement từ đầu, phân tích trade-off, dạy lại người khác,
+    simulate incident, review code người khác, viết ADR/RFC
+```
+
+### B. Deliberate Practice — 4 hoạt động bắt buộc mỗi tuần
+
+| Hoạt động | Tần suất | Mục đích |
+|-----------|----------|----------|
+| **Source Code Reading** | 2–3 giờ/tuần | Đọc source Zustand, TanStack Query, Radix, React Fiber, V8 blog |
+| **Edge Case Lab** | 1 buổi/tuần | "Điều gì xảy ra nếu...", viết test cho edge case, simulate failure |
+| **War Story Documentation** | 1 bài/tuần | Bối cảnh → Ràng buộc → Lựa chọn → Quyết định → Trade-off → Bài học |
+| **Teach Back** | 1 buổi/tuần | Giải thích cho junior tưởng tượng hoặc viết blog kỹ thuật |
+
+### C. Milestone đánh giá năng lực
+
+- **Milestone 1:** Debug được 1 bug production thực mà không cần Google
+- **Milestone 2:** Review PR của người khác, tìm ra lỗi security/performance họ không thấy
+- **Milestone 3:** Viết ADR với ít nhất 3 lựa chọn đã cân nhắc, mỗi lựa chọn có rủi ro cụ thể
+- **Milestone 4:** Tự implement 1 thư viện nhỏ (giống Zustand, Virtual Scroll, hoặc 1 phần React)
+- **Milestone 5:** Xử lý được incident 2 giờ sáng (simulate) — quyết định rollback/feature flag/fix ngay trong 10 phút
+
+---
+
+## STAGE 0 — FOUNDATION (Không có project riêng)
+
+> Mục tiêu: Hiểu "máy tính chạy code như thế nào" và "trình duyệt render trang như thế nào" trước khi chạm vào framework.  
+> Nguyên tắc: Nếu không vẽ được Event Loop và Rendering Pipeline trên giấy, chưa sang Stage 1.
+
+---
+
+### Module 0.1 — JS Engine & Runtime
+
+**Kiến thức:**
+- V8: Ignition → Sparkplug → Maglev → TurboFan; hidden classes; inline caching
+- Event Loop: Call Stack, Heap, Web APIs, Microtask Queue, Macrotask Queue, Render
+- Memory Management: Mark-and-Sweep, Generational GC, `WeakMap`/`WeakSet`/`WeakRef`/`FinalizationRegistry`
+
+**Spiral 3 vòng:**
+- **V1:** Đọc "You Don't Know JS" (Scope & Closures, this & Object Prototypes), vẽ Event Loop
+- **V2:** Benchmark object shape consistent vs inconsistent; debug race condition thực tế; đọc V8 blog
+- **V3:** **Edge Case Lab:** `eval()` và `with` phá vỡ hidden class optimization; **War Story:** "App chậm sau refactor object structure"; **Teach Back:** Giải thích V8 pipeline cho junior
+
+**Exit Criteria:** Giải thích được vì sao `Promise.then` chạy trước `setTimeout(..., 0)`. Debug được memory leak qua Chrome DevTools Memory tab.
+
+---
+
+### Module 0.1x — Scheduler & Browser Task Scheduling *(Bổ sung)*
+
+**Kiến thức:**
+- `requestAnimationFrame`: sync với display refresh rate (60Hz/120Hz), callback nhận timestamp
+- `requestIdleCallback`: chạy task khi main thread rảnh, `timeout` để đảm bảo deadline
+- Prioritized Task Scheduling API: `scheduler.postTask()`, `priority: 'user-blocking' | 'user-visible' | 'background'`
+- React Scheduler internals: `unstable_scheduleCallback`, expiration time, lane-based priority
+- Khi nào dùng cái nào: rAF cho animation, rIC cho non-urgent work, `postTask` cho prioritized queue, React Scheduler cho render priority
+
+**Spiral 3 vòng:**
+- **V1:** Viết demo so sánh `setTimeout(0)` vs `requestAnimationFrame` vs `requestIdleCallback`; vẽ timeline
+- **V2:** Dùng `scheduler.postTask()` để ưu tiên tải dữ liệu hiển thị trước, analytics sau; đọc source React Scheduler (`packages/scheduler`)
+- **V3:** **Edge Case Lab:** `requestIdleCallback` bị delay vĩnh viễn trên trang liên tục busy — fallback bằng `postTask` hoặc rAF; **War Story:** "Animation drop frame vì chạy heavy computation trước rAF"; **Teach Back:** Giải thích React Scheduler priority cho junior
+
+**Exit Criteria:** Giải thích được sự khác biệt giữa rAF, rIC, `postTask`, và React Scheduler. Viết được 1 task queue đơn giản ưu tiên animation > user input > background sync.
+
+---
+
+### Module 0.2 — Browser Rendering Engine *(Bổ sung ADR + CSS Rendering Deep Dive)*
+
+**Kiến thức:**
+- HTML Parser → DOM; CSS Parser → CSSOM; DOM + CSSOM → Render Tree
+- Layout (Reflow) vs Paint (Repaint) vs Composite; GPU Layer; `will-change`, `transform` vs `top/left`
+- Critical Rendering Path: parser-blocking, render-blocking, CSSOM construction
+- Reflow trigger: đọc layout property (`offsetHeight`) sau đó write style → forced synchronous layout (layout thrashing)
+- **CSS Rendering Deep Dive:** Stacking Context (z-index, opacity, transform, filter, isolation, contain), Containing Block (position, transform, perspective), Formatting Context (Block Formatting Context — float, overflow, display: flow-root; Inline Formatting Context)
+
+**Spiral 3 vòng:**
+- **V1:** Đọc "How Browsers Work" (HTML5 Rocks), vẽ pipeline trên giấy; viết demo tạo BFC bằng `overflow: hidden` vs `display: flow-root`
+- **V2:** Profile 1 trang chậm bằng Chrome DevTools Performance tab, tìm forced reflow; debug z-index "không work" do thiếu stacking context
+- **V3:** **Edge Case Lab:** `offsetHeight` trong loop gây layout thrashing — fix bằng batch read/write; **Edge Case Lab:** `position: fixed` bị cắt bởi `transform` của ancestor (containing block thay đổi); **War Story:** "Animation lag vì đổi `top/left` thay vì `transform`"; **Teach Back:** Giải thích GPU Layer và Stacking Context cho junior
+
+**Exit Criteria:** Vẽ được Rendering Pipeline từ HTML đến Pixel. Giải thích được tại sao `transform: translate3d` mượt hơn `top: 10px`. Giải thích được tại sao `z-index: 9999` vẫn bị che. Tạo được BFC để clear float đúng cách.
+
+---
+
+### Module 0.3 — Browser APIs *(Bổ sung Browser Storage Deep Dive)*
+
+**Kiến thức:**
+- Fetch, Storage, IndexedDB (Dexie.js), Broadcast Channel, Clipboard, Notification
+- `IntersectionObserver`, `ResizeObserver`, `MutationObserver`
+- Web Workers, Service Worker, Page Visibility API
+- **Browser Storage & Persistence:** Storage Quota (`navigator.storage.estimate()`), Eviction policy (LRU, persistent), Storage Manager API (`persist()`, `persisted()`), `storage` event để sync cross-tab, `navigator.storage.estimate()` để kiểm tra dung lượng còn lại
+
+**Spiral 3 vòng:**
+- **V1:** Viết demo từng API, so sánh use case; kiểm tra quota bằng `estimate()`
+- **V2:** Dùng `IntersectionObserver` cho lazy load thực tế; Web Workers cho parse CSV; test IndexedDB bị xóa khi hết quota
+- **V3:** **Edge Case Lab:** `ResizeObserver` callback trigger liên tục — debounce đúng cách; **Edge Case Lab:** `persist()` bị từ chối trên Safari private mode — graceful fallback; **War Story:** "Broadcast Channel không work cross-origin" — hiểu đúng scope
+
+**Exit Criteria:** So sánh được `localStorage` vs `sessionStorage` vs `IndexedDB` vs `Cookie` — biết khi nào dùng cái nào. Giải thích được storage quota và eviction. Xử lý được lỗi "QuotaExceededError".
+
+---
+
+### Module 0.3x — Web Components & Shadow DOM *(Bổ sung)*
+
+**Kiến thức:**
+- Custom Elements: `customElements.define()`, `connectedCallback`, `disconnectedCallback`, `attributeChangedCallback`, observed attributes
+- Shadow DOM: `attachShadow({mode: 'open' | 'closed'})`, encapsulation, event retargeting
+- Slot: default slot, named slot (`<slot name="header">`), `slotchange` event
+- Styling: `::part()`, `::slotted()`, `adoptedStyleSheets`, Constructable Stylesheets
+- Use case: Design system encapsulation, micro-frontend isolation, embed third-party widget
+
+**Spiral 3 vòng:**
+- **V1:** Viết 1 custom element đơn giản (counter) với Shadow DOM; style bên ngoài không leak vào, style bên trong không leak ra
+- **V2:** Build 1 component phức tạp (card với header/body/footer slot) dùng Shadow DOM + slot; dùng `::part()` để cho phép host style từ bên ngoài
+- **V3:** **Edge Case Lab:** Form inside Shadow DOM không participate vào form bên ngoài — dùng `ElementInternals` + `attachInternals()`; **Edge Case Lab:** Event từ Shadow DOM bị retarget — `event.target` không đúng khi listen từ host; **War Story:** "CSS từ MFE A leak sang MFE B — fix bằng Shadow DOM"
+
+**Exit Criteria:** Viết được custom element với Shadow DOM, slot, và `::part()`. Giải thích được sự khác biệt `open` vs `closed` mode. Xử lý được form participation và event retargeting.
+
+---
+
+### Module 0.4 — JavaScript Core
+
+**Kiến thức:**
+- Execution Context, hoisting, scope chain, closure
+- `this` binding: implicit/explicit/`new`/arrow/lexical
+- Prototype chain, Class syntactic sugar, `Proxy` & `Reflect`
+
+**Spiral 3 vòng:**
+- **V1:** Đọc YDKJS, viết demo closure, prototype, Proxy
+- **V2:** Debug code JS legacy; dùng Proxy cho validation
+- **V3:** **Edge Case Lab:** `this` mất trong `setTimeout(obj.method, 0)` — 3 cách fix; **Teach Back:** Giải thích Prototype chain cho junior
+
+**Exit Criteria:** Vẽ được Prototype chain cho 1 object bất kỳ. Giải thích được 4 quy tắc `this`.
+
+---
+
+### Module 0.5 — TypeScript Advanced
+
+**Kiến thức:**
+- Generics, constraints, mapped types, conditional types, `infer`
+- Utility Types tự viết: `DeepPartial<T>`, `Paths<T>`, `PickByValueType<T, V>`
+- `unknown` vs `any`, `satisfies` vs `as`, Type Guard, `never`
+- Zod: runtime validation, `z.infer<typeof schema>`, share schema FE-BE
+
+**Spiral 3 vòng:**
+- **V1:** Đọc "Effective TypeScript", viết generic function
+- **V2:** Áp dụng Zod vào form thực tế; đọc source Zod
+- **V3:** **Edge Case Lab:** `as` gây bug production — 3 ví dụ; **War Story:** "API đổi shape nhưng TS không báo vì dùng `as`"
+
+**Exit Criteria:** Viết được `DeepPartial<T>` từ đầu. Giải thích được `infer`. Validate input bằng Zod và infer type.
+
+---
+
+### Module 0.6 — HTTP & Networking *(Bổ sung ADR)*
+
+**Kiến thức:**
+- HTTP/1.1 (head-of-line blocking), HTTP/2 (multiplex, Server Push deprecated), HTTP/3 (QUIC, UDP)
+- TLS/SSL handshake, certificate chain, DNS resolution (recursive/iterative), CDN (edge cache, purge)
+- Compression: gzip, Brotli; `Content-Encoding`
+- `Cache-Control`, `ETag`/`If-None-Match`, `Last-Modified`, `Vary`
+- Resource Hints: `preload`, `prefetch`, `preconnect`, `dns-prefetch`
+
+**Spiral 3 vòng:**
+- **V1:** Đọc "High Performance Browser Networking" (Ilya Grigorik), vẽ HTTP request lifecycle
+- **V2:** Inspect network waterfall, tìm blocking resource; setup CDN + custom domain
+- **V3:** **Edge Case Lab:** `preload` 10 font → cạnh tranh băng thông với hero image; **War Story:** "HTTP/2 multiplex nhưng 1 slow request vẫn block page vì render-blocking CSS"
+
+**Exit Criteria:** Giải thích được tại sao HTTP/2 multiplex nhưng vẫn cần domain sharding cho third-party. Phân biệt `preload` vs `prefetch` vs `preconnect`.
+
+---
+
+### Module 0.6x — API Design & Backend Contract *(Bổ sung)*
+
+**Kiến thức:**
+- REST maturity model (Level 0–3), resource naming, HTTP method semantics (idempotent vs safe)
+- Pagination: offset vs cursor (`created_at` + `id`), pros/cons, deep paging problem
+- Filtering, sorting, field selection (`?fields=name,email`), API versioning (URL vs header vs media type)
+- Idempotency key: tại sao cần, cách generate (UUID + client seed), retry strategy
+- Rate Limit: `429 Too Many Requests`, `Retry-After`, exponential backoff, jitter
+- Frontend perspective: consume API đúng cách, handle `409 Conflict`, `412 Precondition Failed`
+
+**Spiral 3 vòng:**
+- **V1:** Đọc "API Design Patterns" hoặc Microsoft REST API Guidelines; viết 1 spec API đơn giản cho blog
+- **V2:** Implement cursor pagination cho feed; xử lý rate limit với exponential backoff; đọc source Stripe API design
+- **V3:** **Edge Case Lab:** User scroll nhanh → gửi 10 request pagination cùng lúc → race condition, hiển thị sai thứ tự; fix bằng request cancellation hoặc sequencing; **War Story:** "Backend đổi API version không báo trước — FE crash vì không validate response shape"
+
+**Exit Criteria:** Thiết kế được API endpoint với cursor pagination và idempotency key. Implement exponential backoff với jitter. Giải thích được tại sao offset pagination không scale.
+
+---
+
+### Module 0.7 — Debugging Methodology *(Bổ sung)*
+
+**Kiến thức:**
+- **RIMHVRP framework:** Reproduce → Isolate → Measure → Hypothesis → Verify → Fix → Postmortem
+- Reproduce: tìm minimal steps, check environment, version, data
+- Isolate: binary search (git bisect), comment code, swap component, devtools profiler
+- Measure: không đoán — dùng Performance tab, Memory tab, Network tab, LoAF API
+- Hypothesis: dựa trên data, không dựa trên cảm tính
+- Verify: fix phải có test/regression, reproduce lại bug sau fix để confirm
+- Postmortem: timeline, impact, root cause (5 Whys), fix, action items, prevention
+
+**Spiral 3 vòng:**
+- **V1:** Đọc "How to Report Bugs Effectively" (Simon Tatham); học cách đọc stack trace, source map
+- **V2:** Debug 1 bug thực tế áp dụng đủ 7 bước; dùng Chrome DevTools để tìm root cause (không console.log)
+- **V3:** **Edge Case Lab:** Bug chỉ reproduce trên production — dùng Sentry breadcrumbs, session replay, log correlation ID để isolate; **War Story:** "Fix bug bằng cách đoán → introduce regression lớn hơn"; **Teach Back:** Hướng dẫn junior debug bằng hypothesis-driven thay vì "thử đại"
+
+**Exit Criteria:** Debug được 1 bug production thực trong 30 phút không cần Google (chỉ dùng devtools + source code). Viết được postmortem đúng format.
+
+---
+
+## STAGE 1 — BUILD & TOOLING (Không có project riêng)
+
+> Mục tiêu: Hiểu công cụ biên dịch và quản lý code trước khi viết app lớn.
+
+---
+
+### Module 1.1 — Build Tool & Bundler
+
+**Kiến thức:**
+- Webpack/Vite/Rspack/Turbopack: HMR, tree-shaking, code splitting, dynamic import
+- `sideEffects: false`, `/*#__PURE__*/`, ESM vs CommonJS
+- Dev vs Production: source map, minification (Terser/esbuild/swc)
+
+**Spiral 3 vòng:**
+- **V1:** Cấu hình Webpack và Vite từ đầu
+- **V2:** Phân tích bundle, tìm duplicate dependencies
+- **V3:** **Edge Case Lab:** Module có `sideEffects` (import CSS global) làm tree-shaking thất bại
+
+**Exit Criteria:** Giải thích được tại sao ESM tree-shake tốt hơn CommonJS. Tìm được duplicate `lodash` trong bundle.
+
+---
+
+### Module 1.2 — Package Manager
+
+**Kiến thức:**
+- npm/yarn/pnpm: lockfile, peer dependencies, `workspace:` protocol
+- Monorepo: `changesets`, semantic versioning, dependency confusion
+
+**Spiral 3 vòng:**
+- **V1:** Setup pnpm workspace, resolve lockfile conflict
+- **V2:** Publish 1 package lên npm/GitHub Packages
+- **V3:** **Edge Case Lab:** Peer dependency hell — React 18 vs 19 trong cùng monorepo
+
+**Exit Criteria:** Tự resolve lockfile conflict không xoá `node_modules`. Giải thích được dependency confusion.
+
+---
+
+### Module 1.3 — Git Teamwork
+
+**Kiến thức:**
+- Rebase vs Merge, interactive rebase, cherry-pick, `reflog`, `bisect`
+- Conventional Commits, commit scope, `sparse-checkout`
+
+**Spiral 3 vòng:**
+- **V1:** Thực hành từng lệnh trên repo test
+- **V2:** Simulate conflict nghiêm trọng (lockfile + rename + binary)
+- **V3:** **Edge Case Lab:** `git bisect` tìm regression trong 20 commit; cứu commit mất bằng `reflog`
+
+**Exit Criteria:** Tự resolve lockfile conflict. Giải thích được khi nào rebase, khi nào merge.
+
+---
+
+## STAGE 2 — PROJECT 1: SAAS LANDING + BLOG + NEWSLETTER
+
+> Business context: Landing page để convert visitors, blog để SEO, newsletter để capture leads.  
+> Kiến thức mới cover: Animation cơ bản, Mobile Web, Browser Security nền tảng, CI/CD nền tảng, **Accessibility Engineering**.
+
+---
+
+### Module 2.1 — React Core & Framework Evolution
+
+**Kiến thức:**
+- Fiber, Reconciliation, diffing, Re-render vs Commit phase
+- Class → Hooks → React 19; `useMemo`/`useCallback`/`React.memo` đúng cách
+- React DevTools Profiler, React Compiler (auto-memoization)
+
+**Spiral 3 vòng:**
+- **V1:** Dùng Profiler tìm unnecessary render
+- **V2:** Đọc source `ReactFiberWorkLoop.js`
+- **V3:** **Edge Case Lab:** Strict Mode double mount — viết effect KHÔNG idempotent, chứng minh fail, fix
+
+**Exit Criteria:** Dùng Profiler chứng minh được 1 component re-render vô ích và fix đúng.
+
+---
+
+### Module 2.2 — Next.js App Router
+
+**Kiến thức:**
+- File-based routing, nested layouts, SC vs CC, RSC Serialization Limits
+- 4 loại cache: Request Memoization, Data Cache, Full Route Cache, Router Cache
+- Server Actions: `'use server'`, progressive enhancement, `revalidate`, error handling
+
+**Spiral 3 vòng:**
+- **V1:** Xây app với routing, layout, SC/CC
+- **V2:** Tự implement 1 app với cả 4 strategy (CSR, SSR, SSG, ISR) — đo performance
+- **V3:** **Edge Case Lab:** Hydration Mismatch — 5 tình huống khác nhau, debug và fix
+
+**Exit Criteria:** Giải thích được 4 loại cache và cách invalidate. Không thêm `'use client'` ở root layout.
+
+---
+
+### Module 2.3 — CSS Modern & Tailwind
+
+**Kiến thức:**
+- `@layer`, Container Queries (`@container`), `:has()`, Native Nesting, `contain`, `content-visibility`
+- Tailwind config: `theme.extend`, custom plugins, presets, dark mode
+- shadcn/ui: copy-paste, customize hoàn toàn
+
+**Spiral 3 vòng:**
+- **V1:** Cấu hình Tailwind, dùng shadcn/ui, viết CSS với `@layer`
+- **V2:** Tự build 1 component từ đầu (không dùng shadcn) với Tailwind + CSS native
+- **V3:** **Edge Case Lab:** Container Queries trong deeply nested grid; **War Story:** "CLS cao vì font swap không có `size-adjust`"
+
+**Exit Criteria:** Tự build được 1 component phức tạp (Modal/Dropdown) từ đầu, accessible.
+
+---
+
+### Module 2.4 — Accessibility Engineering *(Bổ sung — Module riêng)*
+
+**Kiến thức:**
+- WCAG 2.1/2.2 AA: Perceivable, Operable, Understandable, Robust — 78 success criteria thường gặp
+- Semantic HTML: landmark regions (`<main>`, `<nav>`, `<aside>`), heading hierarchy, `<button>` vs `<a>`, form labels
+- ARIA: khi nào cần (không dùng nếu semantic HTML đủ), `role`, `aria-*` states/properties, `aria-live` regions
+- Keyboard Navigation: `tabindex` strategy (roving tabindex), focus trap, focus visible, skip links, logical tab order
+- Screen Reader: NVDA (Windows), VoiceOver (macOS/iOS), TalkBack (Android) — test flow chính bằng screen reader thật
+- Color & Contrast: WCAG AA 4.5:1 normal text, 3:1 large text/UI components, không dùng color alone để truyền thông tin
+- Motion: `prefers-reduced-motion`, `prefers-contrast`, `prefers-color-scheme`
+- Tools: axe DevTools, Lighthouse a11y audit, `jest-axe`, WAVE, pa11y
+
+**Spiral 3 vòng:**
+- **V1:** Audit landing page bằng axe DevTools, fix tất cả critical/serious issues; viết semantic HTML đúng cho blog
+- **V2:** Test toàn bộ flow (subscribe newsletter, đọc blog) bằng VoiceOver/NVDA không dùng chuột; implement focus trap cho modal
+- **V3:** **Edge Case Lab:** Custom dropdown — roving `tabindex`, `aria-expanded`, `aria-activedescendant`, screen reader đọc đúng "3 of 10"; **Edge Case Lab:** Dynamic content update (toast notification) — `aria-live="polite"` vs `aria-live="assertive"`; **War Story:** "Bị kiện vì website không accessible (ADA/WCAG lawsuit)"
+
+**Exit Criteria:** Landing page pass WCAG 2.1 AA audit (axe DevTools 0 critical/serious). Navigate được toàn bộ site bằng keyboard. Screen reader đọc đúng flow. Không dùng `div` làm button.
+
+---
+
+### Module 2.5 — Animation *(Bổ sung ADR)*
+
+**Kiến thức:**
+- CSS Transitions & Animations: `transition`, `animation`, `keyframes`, `will-change`
+- FLIP technique (First, Last, Invert, Play) cho layout animation hiệu năng cao
+- Framer Motion cơ bản: `motion`, `AnimatePresence`, layout animation
+- View Transitions API (nếu browser support)
+
+**Spiral 3 vòng:**
+- **V1:** Thêm hover transition, page transition cho landing
+- **V2:** Implement FLIP cho list reorder; dùng Framer Motion cho page enter/exit
+- **V3:** **Edge Case Lab:** Animation trên low-end device — giảm complexity bằng `prefers-reduced-motion`
+
+**Exit Criteria:** Animation 60fps, không gây layout thrashing, tôn trọng `prefers-reduced-motion`.
+
+---
+
+### Module 2.6 — Mobile Web *(Bổ sung ADR)*
+
+**Kiến thức:**
+- Viewport meta tag, `device-width`, CSS `env(safe-area-inset-*)` cho notch
+- Touch Events vs Pointer Events (`touch-action`, `pointer-events`)
+- Virtual Keyboard: `visualViewport` API, scroll behavior khi keyboard mở
+- Responsive Images: `srcset`/`sizes`, `loading="lazy"`, `decoding="async"`
+- Mobile Performance: tap delay (đã fix trong modern browser), passive event listeners
+
+**Spiral 3 vòng:**
+- **V1:** Landing page responsive, test trên real device/DevTools mobile
+- **V2:** Xử lý virtual keyboard không đẩy layout, dùng Pointer Events cho drag
+- **V3:** **Edge Case Lab:** Touch event delay — `touch-action: manipulation` vs FastClick; **War Story:** "Button nhỏ quá trên mobile — user tap nhầm liên tục"
+
+**Exit Criteria:** Landing page chạy mượt trên mobile (test thật hoặc DevTools throttling). Tap target đủ lớn (48x48px).
+
+---
+
+### Module 2.7 — SEO Technical + i18n
+
+**Kiến thức:**
+- Meta tags động, JSON-LD, sitemap, robots.txt, GEO (Generative Engine Optimization)
+- next-i18n: locale routing (`/en/blog`, `/vi/blog`), RTL, multi-currency format
+
+**Spiral 3 vòng:**
+- **V1:** Setup i18n routing, thêm JSON-LD, tạo sitemap
+- **V2:** Verify Googlebot render đúng bằng Search Console
+- **V3:** **Edge Case Lab:** Googlebot không render JavaScript — verify và fix bằng SSR/SSG
+
+**Exit Criteria:** Trang được index trên Google, có structured data valid, i18n routing hoạt động.
+
+---
+
+### Module 2.8 — Form Engineering + Server Actions
+
+**Kiến thức:**
+- `react-hook-form`: `register`, `Controller`, `watch` vs `useWatch`
+- Zod schema + resolver, validation động, cross-field validation
+- Auto-save draft (debounce + `localStorage`), dirty state tracking
+
+**Spiral 3 vòng:**
+- **V1:** Xây contact form + newsletter form với RHF + Zod + Server Action
+- **V2:** Thêm auto-save draft, xử lý race condition khi user submit trước auto-save
+- **V3:** **Edge Case Lab:** User paste emoji vào email field — form crash? Validate unicode đúng cách
+
+**Exit Criteria:** Form hoạt động với validation real-time, auto-save, không dùng `any`.
+
+---
+
+### Module 2.9 — Browser Security *(Bổ sung ADR)*
+
+**Kiến thức:**
+- Same Origin Policy (SOP): scheme + host + port
+- `iframe sandbox`: `allow-scripts`, `allow-same-origin`, `allow-popups`
+- COOP (Cross-Origin Opener Policy), COEP (Cross-Origin Embedder Policy), CORP (Cross-Origin Resource Policy)
+- Permissions Policy: `camera`, `microphone`, `geolocation`, `payment`
+- Trusted Types: chống DOM XSS bằng cách bắt buộc sanitize trước khi `innerHTML`
+
+**Spiral 3 vòng:**
+- **V1:** Đọc OWASP Cheat Sheet, setup CSP header, `iframe sandbox` cho embed
+- **V2:** Test SOP bằng 2 origin khác nhau; setup COOP/COEP cho cross-origin isolation
+- **V3:** **Edge Case Lab:** Embed third-party iframe — `sandbox` nhưng vẫn cần `postMessage` an toàn; **War Story:** "XSS qua `postMessage` không validate origin"
+
+**Exit Criteria:** Giải thích được SOP, CSP, `iframe sandbox`, COOP/COEP. Setup CSP header chặn script lạ.
+
+---
+
+### Module 2.10 — Frontend Security
+
+**Kiến thức:**
+- XSS: Stored/Reflected/DOM-based; React JSX escape nhưng `dangerouslySetInnerHTML` thì không; DOMPurify
+- CSRF: SameSite cookie, CSRF token cho form mutation
+- CORS: hiểu đúng bản chất (browser enforce, không phải server block)
+
+**Spiral 3 vòng:**
+- **V1:** Đọc OWASP Top 10, setup CSP header
+- **V2:** Tạo demo XSS qua `dangerouslySetInnerHTML` và vá bằng DOMPurify
+- **V3:** **Edge Case Lab:** XSS qua SVG upload — file "ảnh" chứa script
+
+**Exit Criteria:** Tự giải thích được 1 lỗ hổng XSS giả lập và cách vá. Giải thích được tại sao `localStorage` không an toàn cho token.
+
+---
+
+### Module 2.11 — Authentication Architecture *(Bổ sung ADR)*
+
+**Kiến thức:**
+- Session vs JWT: stateful vs stateless, trade-offs
+- Cookie: `HttpOnly`, `Secure`, `SameSite`, `Path`, `Domain`, `Expires`/`Max-Age`
+- Refresh Token Rotation: tại sao cần, cách implement an toàn
+- PKCE (Proof Key for Code Exchange) cho OAuth public client (SPA/mobile)
+- Silent Refresh: refresh token trong `iframe` hoặc background request
+- Multi-tab Auth: `BroadcastChannel` sync login/logout
+- Logout Strategy: local logout (xóa state) vs global logout (invalidate session server-side)
+- Token Storage: httpOnly cookie (ưu tiên) vs `localStorage` (chỉ khi không có backend)
+
+**Spiral 3 vòng:**
+- **V1:** Implement auth flow với Clerk/NextAuth, hiểu từng cookie attribute
+- **V2:** Handle token refresh, logout cross-tab (Broadcast Channel), silent refresh
+- **V3:** **Edge Case Lab:** Token hết hạn giữa chừng API call — queue request và retry sau refresh; **War Story:** "Refresh token bị đánh cắp vì không rotate — attacker dùng token cũ vĩnh viễn"
+
+**Exit Criteria:** Giải thích được PKCE, Refresh Token Rotation, `SameSite=Lax` vs `Strict`. Auth hoạt động, token không lưu `localStorage` nhạy cảm.
+
+---
+
+### Module 2.12 — Testing Nền tảng
+
+**Kiến thức:**
+- Vitest + Testing Library: test behavior không test implementation
+- `userEvent` vs `fireEvent`, `waitFor`, `findBy`, `within`
+- Mock: `vi.fn()`, `vi.spyOn()`, `vi.mock()`
+
+**Spiral 3 vòng:**
+- **V1:** Viết unit test cho utility function và component thuần
+- **V2:** Mock module phức tạp, test async component
+- **V3:** **Edge Case Lab:** Test optimistic update rollback — verify UI quay lại state cũ khi API fail
+
+**Exit Criteria:** Coverage report chạy được, đọc hiểu được vì sao 1 test fail. Unit test cho form validation pass.
+
+---
+
+### Module 2.13 — Performance Measurement
+
+**Kiến thức:**
+- Lighthouse CI: fail PR nếu score < threshold
+- Core Web Vitals: LCP (4 giai đoạn), INP (Input/Processing/Presentation), CLS (ảnh/font/content injected)
+- LoAF API: `PerformanceObserver` với `entryType: 'long-animation-frame'`, đọc `entry.scripts`
+- Performance Budget: `size-limit`, Lighthouse CI budget, `bundlephobia`
+
+**Spiral 3 vòng:**
+- **V1:** Chạy Lighthouse, setup Lighthouse CI
+- **V2:** Dùng LoAF API tìm script gây chậm; set Performance Budget
+- **V3:** **Edge Case Lab:** `preload` lạm dụng làm cạnh tranh băng thông
+
+**Exit Criteria:** Cho 1 trang có INP cao, tự dùng LoAF API tìm ra đúng script gây chậm. Viết Performance Budget config chặn PR.
+
+---
+
+### Module 2.14 — CI/CD *(Bổ sung ADR)*
+
+**Kiến thức:**
+- GitHub Actions: workflow `lint → test → build → deploy`, matrix strategy
+- Preview Deploy: Vercel/Railway preview URL cho mỗi PR
+- Semantic Versioning: `major.minor.patch`, Conventional Commits (`feat`, `fix`, `BREAKING CHANGE`)
+- `changesets`: versioning trong monorepo, changelog generation
+
+**Spiral 3 vòng:**
+- **V1:** Setup GitHub Actions cho Project 1: lint → test → build → deploy to Vercel
+- **V2:** Thêm preview deploy cho PR, setup `size-limit` trong CI
+- **V3:** **Edge Case Lab:** PR làm tăng bundle 200KB — CI block merge; **War Story:** "Deploy production nhầm vì không có preview check"
+
+**Exit Criteria:** CI/CD chạy tự động cho mỗi PR, có preview deploy, block merge nếu test fail hoặc bundle vượt budget.
+
+---
+
+### Module 2.15 — Deploy & Observability Nền tảng
+
+**Kiến thức:**
+- Vercel deploy, custom domain, Cloudflare (DNS, SSL, CDN, DDoS)
+- Sentry: error tracking, source map, breadcrumbs
+- Environment: staging/prod parity, GitHub Secrets
+
+**Spiral 3 vòng:**
+- **V1:** Deploy Project 1, setup custom domain, Sentry
+- **V2:** Simulate lỗi production, theo dõi trên Sentry
+- **V3:** **War Story:** "Không có source map — stack trace unreadable"
+
+**Exit Criteria:** Project 1 live, Sentry tracking lỗi thực, Lighthouse score đạt ngưỡng.
+
+**Deliverable Stage 2:** Project 1 — SaaS Landing + Blog + Newsletter, PWA cơ bản, animation mượt, mobile-friendly, **accessible (WCAG AA)**, auth cơ bản, CI/CD auto deploy, Sentry monitoring.
+
+---
+
+## STAGE 3 — PROJECT 2: E-COMMERCE CHECKOUT FLOW
+
+> Business context: Checkout flow là nơi mất khách nhiều nhất. Cần state management phân tách, auth hoàn chỉnh, animation UX, mobile optimized.
+
+---
+
+### Module 3.1 — State Management: TanStack Query + Zustand
+
+**Kiến thức:**
+- Server state (TanStack Query): `queryKey`, `staleTime`, `gcTime`, `keepPreviousData`, prefetching, `optimistic updates`
+- Client state (Zustand): `create()`, slice pattern, middleware (`persist`, `devtools`), `subscribe`
+- Phân tách rõ: server state không đưa vào global store
+
+**Spiral 3 vòng:**
+- **V1:** Setup TanStack Query cho product catalog, Zustand cho cart
+- **V2:** Đọc source Zustand (~100 lines core); implement optimistic update
+- **V3:** **Edge Case Lab:** Cart mất khi refresh — persist `localStorage` + sync với server conflict; **War Story:** "Zustand store bị mutate trực tiếp"
+
+**Exit Criteria:** Phân biệt rõ khi nào dùng TanStack Query vs Zustand. Giải thích được trade-offs.
+
+---
+
+### Module 3.2 — State Machine Áp Dụng (XState)
+
+**Kiến thức:**
+- States, transitions, events, guards
+- Checkout wizard: Cart → Shipping → Payment → Confirmation
+
+**Spiral 3 vòng:**
+- **V1:** Xây checkout flow với XState
+- **V2:** Thêm guards, test machine isolation
+- **V3:** **Edge Case Lab:** User back button giữa chừng — state machine xử lý đúng?
+
+**Exit Criteria:** Checkout wizard hoạt động, không miss step, có thể test machine riêng biệt.
+
+---
+
+### Module 3.3 — Form Engineering Nâng Cao
+
+**Kiến thức:**
+- Field arrays, multi-step validation, dirty state tracking
+- i18n cho product data, multi-currency formatting
+
+**Spiral 3 vòng:**
+- **V1:** Xây multi-step checkout form với field arrays
+- **V2:** Thêm cross-field validation (shipping method ảnh hưởng shipping address)
+- **V3:** **Edge Case Lab:** User rời trang giữa chừng — cảnh báo dirty state, lưu draft
+
+**Exit Criteria:** Form multi-step hoạt động, validate đúng từng bước.
+
+---
+
+### Module 3.4 — Payment & Idempotency
+
+**Kiến thức:**
+- Stripe integration (test mode): Checkout, Subscription, Webhooks
+- Idempotency key: tại sao cần, cách generate và xử lý
+- Webhook security: verify signature
+
+**Spiral 3 vòng:**
+- **V1:** Tích hợp Stripe test mode vào checkout
+- **V2:** Handle webhook, verify signature, test idempotency
+- **V3:** **Edge Case Lab:** User click "Pay" 2 lần nhanh — idempotency ngăn double charge?
+
+**Exit Criteria:** Payment flow hoạt động trong test mode, có idempotency key.
+
+---
+
+### Module 3.5 — Error Handling & Resilience
+
+**Kiến thức:**
+- Error Boundary: `react-error-boundary`, fallback UI, reset keys
+- Graceful degradation: 1 phần API fail không kéo sập cả trang
+- Retry logic: exponential backoff, circuit breaker cơ bản ở FE
+
+**Spiral 3 vòng:**
+- **V1:** Setup Error Boundary ở route level và component level
+- **V2:** Thiết kế UI theo từng phần độc lập
+- **V3:** **Edge Case Lab:** API fail giữa chừng checkout — giữ state, cho user retry từ bước bị fail
+
+**Exit Criteria:** App "sống sót" khi 1 phần API fail. User không thấy trang trắng.
+
+---
+
+### Module 3.6 — PWA & Offline
+
+**Kiến thức:**
+- Service Worker: `next-pwa` hoặc Workbox
+- Cache strategies: Cache First, Network First, Stale While Revalidate
+- Background sync: queue requests khi offline
+- Web App Manifest, install prompt
+
+**Spiral 3 vòng:**
+- **V1:** Setup PWA với offline cart
+- **V2:** Test offline bằng DevTools Network tab
+- **V3:** **Edge Case Lab:** User offline thêm cart → online → sync conflict với server cart
+
+**Exit Criteria:** PWA hoạt động: offline cart, add to home screen, background sync.
+
+---
+
+### Module 3.6x — Caching Patterns & Invalidation *(Bổ sung)*
+
+**Kiến thức:**
+- **Cache patterns:** Cache Aside (Lazy Loading), Read Through, Write Through, Write Back (Write Behind)
+- **Cache problems:** Cache Stampede (thundering herd), Dogpile effect, Cache penetration, Cache avalanche
+- **Invalidation strategies:** TTL (Time To Live), Event-based invalidation, Active invalidation, Version-based
+- **Frontend caching:** HTTP Cache vs In-memory cache vs Service Worker cache vs State management cache (TanStack Query gcTime)
+- **When to use:** product catalog (cache aside), cart (write through), user session (TTL + active invalidation)
+
+**Spiral 3 vòng:**
+- **V1:** Vẽ sơ đồ 4 cache pattern; cấu hình TanStack Query `staleTime`/`gcTime` đúng cho từng loại data (product vs cart vs user)
+- **V2:** Simulate cache stampede bằng cách refresh 100 tab cùng lúc — fix bằng staggered refresh hoặc request coalescing; implement cache warming cho product catalog
+- **V3:** **Edge Case Lab:** "Cart total hiển thị sai sau khi admin đổi giá" — cache invalidation không đến client; fix bằng event-based invalidation hoặc version field; **War Story:** "TTL quá dài → user thấy giá cũ; TTL quá ngắn → DB chết"
+
+**Exit Criteria:** Phân biệt được 4 cache pattern và biết khi nào dùng. Giải thích được cache stampede và cách phòng tránh. Thiết kế được invalidation strategy cho e-commerce app.
+
+---
+
+### Module 3.7 — Animation Nâng Cao & Micro-interactions
+
+**Kiến thức:**
+- Framer Motion: `AnimatePresence`, layout animation, gestures (`drag`, `whileHover`, `whileTap`)
+- FLIP cho list reorder trong cart
+- `prefers-reduced-motion` cho accessibility
+
+**Spiral 3 vòng:**
+- **V1:** Thêm animation cho add-to-cart, page transition
+- **V2:** Implement FLIP cho cart item reorder
+- **V3:** **Edge Case Lab:** Animation trên device cũ — giảm complexity hoặc disable
+
+**Exit Criteria:** Animation 60fps, không gây jank, tôn trọng `prefers-reduced-motion`.
+
+---
+
+### Module 3.8 — Mobile Web Nâng Cao
+
+**Kiến thức:**
+- Touch gesture: swipe để xóa item trong cart (`touchstart`/`touchmove`/`touchend`)
+- Virtual Keyboard: tránh scroll jump khi focus input
+- Safe Area: `env(safe-area-inset-bottom)` cho nút checkout
+- Mobile Performance: passive event listeners, `touch-action: manipulation`
+
+**Spiral 3 vòng:**
+- **V1:** Swipe to delete trong cart, fix keyboard scroll
+- **V2:** Test trên real device với throttling 3G
+- **V3:** **Edge Case Lab:** User zoom vào input (font-size < 16px trên iOS) — fix bằng `font-size: 16px`
+
+**Exit Criteria:** Checkout flow chạy mượt trên mobile. Tap target đủ lớn. Không có scroll jump khi nhập liệu.
+
+---
+
+### Module 3.9 — Testing Nâng Cao
+
+**Kiến thức:**
+- Unit test logic giỏ hàng: tính tổng, discount, tax, edge case số lượng âm
+- MSW: mock API cho checkout flow, intercept network request
+- Playwright E2E: full checkout flow
+
+**Spiral 3 vòng:**
+- **V1:** Viết unit test cho cart logic, setup MSW
+- **V2:** Mock Stripe API, test error case (card declined)
+- **V3:** **Edge Case Lab:** Test "offline add to cart → online → sync" bằng MSW + network toggle
+
+**Exit Criteria:** E2E test full checkout flow pass: Browse → Add cart → Checkout → Payment → Confirmation.
+
+**Deliverable Stage 3:** Project 2 — E-commerce PWA, có auth hoàn chỉnh, payment test mode, animation UX, mobile optimized, offline cart, test coverage > 80% critical path.
+
+---
+
+## STAGE 4 — PROJECT 3: ADMIN DASHBOARD (ENTERPRISE ANALYTICS)
+
+> Business context: Dashboard quản lý SaaS — theo dõi metrics real-time, quản lý 10K+ users, xuất báo cáo.  
+> Kiến thức mới cover: Frontend Architecture, Enterprise Patterns, Observability, CI/CD nâng cao, Data Layer nâng cao.
+
+---
+
+### Module 4.1 — Redux Ecosystem
+
+**Kiến thức:**
+- RTK: `configureStore`, `createSlice`, `createAsyncThunk`, `createEntityAdapter`
+- RTK Query: `createApi`, `providesTags`/`invalidatesTags`
+- Redux Saga: `call`, `put`, `take`, `fork`, `race`, cancellation (`takeLatest`, `takeEvery`)
+- State normalization, selectors memoized (`createSelector`)
+
+**Spiral 3 vòng:**
+- **V1:** Setup Redux store cho dashboard, dùng RTK Query cho API
+- **V2:** Implement Saga cho polling metrics, cancellation khi user rời trang
+- **V3:** **Edge Case Lab:** Redux Saga cancellation không work — memory leak khi user rời trang nhanh
+
+**Exit Criteria:** So sánh có ý thức: khi nào Redux hợp lý hơn TanStack Query + Zustand.
+
+---
+
+### Module 4.2 — Data Visualization
+
+**Kiến thức:**
+- Recharts: Line, Bar, Pie, Area, Composed
+- D3.js cơ bản: scale, axis, data join (enter/update/exit)
+- Chart.js: Canvas-based, performance tốt large dataset
+
+**Spiral 3 vòng:**
+- **V1:** Xây dashboard với 5+ chart types bằng Recharts
+- **V2:** Custom 1 chart bằng D3.js khi Recharts không đủ
+- **V3:** **Edge Case Lab:** Real-time chart memory leak — subscription không cleanup
+
+**Exit Criteria:** Dashboard với 5+ chart types, real-time update, không memory leak.
+
+---
+
+### Module 4.3 — Virtual Scroll & Web Workers
+
+**Kiến thức:**
+- `react-window`: cơ chế windowing (chỉ render item trong viewport + buffer)
+- Web Workers: `new Worker()`, `postMessage`/`onmessage`, terminate để tránh leak
+- `scheduler.yield()`: trả quyền cho main thread (Chrome 115+)
+- `SharedArrayBuffer`: multi-threading — cần `COOP`/`COEP` headers
+- `OffscreenCanvas`: render canvas trong worker
+
+**Spiral 3 vòng:**
+- **V1:** Implement virtual scroll cho 10K+ rows; dùng Worker parse CSV
+- **V2:** So sánh performance: main thread vs Worker vs `scheduler.yield()`
+- **V3:** **Edge Case Lab:** Web Worker cho task nhẹ — overhead serialize lớn hơn lợi ích
+
+**Exit Criteria:** Giải thích được khi nào chọn `scheduler.yield()` thay vì Web Worker.
+
+---
+
+### Module 4.4 — Data Layer Nâng Cao *(Bổ sung ADR)*
+
+**Kiến thức:**
+- Normalization: Normalizr, RTK Entity Adapter, flat state shape
+- Optimistic Concurrency: version field, `If-Match` header, conflict detection
+- Conflict Resolution: last-write-wins vs merge strategy (CRDT cơ bản)
+- Offline Sync: queue mutation khi offline, sync khi online, handle conflict
+- Pagination: offset vs cursor pagination (cursor: `created_at` + `id`, không skip)
+- Infinite Query: `useInfiniteQuery`, `getNextPageParam`
+- Streaming: Server-Sent Events (SSE), `ReadableStream` API, NDJSON
+- Realtime: WebSocket vs SSE vs Long Polling — khi nào dùng cái nào
+
+**Spiral 3 vòng:**
+- **V1:** Normalize state cho 10K+ users; implement cursor pagination
+- **V2:** Thêm offline sync cho "edit user profile"; test conflict khi 2 tab cùng edit
+- **V3:** **Edge Case Lab:** 2 user cùng edit 1 record — optimistic update conflict, giải quyết bằng versioning hoặc merge UI
+
+**Exit Criteria:** Phân biệt được offset vs cursor pagination. Giải thích được optimistic concurrency và conflict resolution.
+
+---
+
+### Module 4.5 — Monorepo & Component Documentation
+
+**Kiến thức:**
+- Turborepo: `turbo.json` pipeline, remote caching, task filtering
+- pnpm workspaces, `workspace:` protocol
+- Storybook: setup, writing stories, addons, MDX docs
+- Chromatic: visual regression, UI review workflow
+
+**Spiral 3 vòng:**
+- **V1:** Setup Turborepo với apps/packages, Storybook
+- **V2:** Viết stories cho components, setup Chromatic
+- **V3:** **Edge Case Lab:** Component thay đổi design token — Chromatic bắt unintended change
+
+**Exit Criteria:** Monorepo hoạt động, Storybook documented, Chromatic visual regression test pass.
+
+---
+
+### Module 4.6 — BFF Pattern
+
+**Kiến thức:**
+- Next.js Route Handler/Server Action như BFF: aggregate API, transform data shape
+- Khi nào cần tách BFF standalone (mobile app, third-party integration)
+- tRPC: type-safe end-to-end
+
+**Spiral 3 vòng:**
+- **V1:** Xây BFF bằng Next.js Route Handler cho dashboard
+- **V2:** So sánh REST vs GraphQL vs tRPC cho dashboard use case
+- **V3:** **War Story:** "Viết transform logic phức tạp trong component — dấu hiệu cần BFF layer"
+
+**Exit Criteria:** Giải thích được khi nào Next.js đủ làm BFF, khi nào cần tách standalone.
+
+---
+
+### Module 4.7 — Frontend Architecture *(Bổ sung ADR)*
+
+**Kiến thức:**
+- **Feature-Sliced Design (FSD):** layers (`app`, `processes`, `pages`, `widgets`, `features`, `entities`, `shared`), slice theo business domain thay vì technical type
+- **Atomic Design:** atoms, molecules, organisms, templates, pages — dùng cho design system
+- **DDD Frontend:** bounded context, aggregate, entity, value object — áp dụng vào FE
+- **Vertical Slice:** 1 feature = 1 folder chứa UI + state + API + test
+- **Modular Monolith FE:** nhiều module trong 1 codebase, có boundary rõ ràng, không phải micro-frontend
+- **Folder Architecture:** flat vs nested, barrel exports (`index.ts`), colocation principle
+
+**Spiral 3 vòng:**
+- **V1:** Refactor dashboard theo FSD hoặc Vertical Slice
+- **V2:** So sánh 3 architecture cho cùng 1 feature; viết ADR chọn 1
+- **V3:** **Edge Case Lab:** "Folder theo type (`components/`, `hooks/`) → 1 feature nằm rải rác 5 folder" — refactor thành Vertical Slice
+
+**Exit Criteria:** Viết được ADR so sánh ít nhất 3 architecture pattern cho 1 project. Giải thích được khi nào dùng FSD, khi nào dùng Atomic Design.
+
+---
+
+### Module 4.8 — Enterprise Patterns *(Bổ sung ADR + Feature Flags Nâng Cao)*
+
+**Kiến thức:**
+- **RBAC (Role-Based Access Control):** permission matrix, route guard, UI guard (ẩn nút), API guard (check server)
+- **AB Testing:** phân nhóm user, đo conversion, statistical significance (p-value, sample size)
+- **Audit Log:** log hành động user (ai, làm gì, khi nào, kết quả), không xóa, append-only
+- **Multi-tenancy:** schema-based vs row-based (tenant_id), ảnh hưởng đến FE (subdomain routing, theme per tenant)
+- **White Label:** custom theme, logo, domain cho mỗi tenant
+- **Localization Strategy:** không chỉ dịch text mà còn format number/date/currency theo locale, RTL, content per locale
+- **Feature Flags nâng cao:** LaunchDarkly/Unleash, **Dark Launch** (ship code ẩn, test production), **Progressive Rollout** (0% → 5% → 25% → 100%), **Canary** (so sánh metrics 2 nhóm), **Kill Switch** (tắt feature trong 1 phút), targeting theo user segment, A/B test integration
+
+**Spiral 3 vòng:**
+- **V1:** Implement RBAC trong dashboard (admin vs user view); setup Feature Flag đơn giản
+- **V2:** Thêm AB Testing cho 1 dashboard layout; viết audit log cho "delete user"; implement progressive rollout cho feature mới
+- **V3:** **Edge Case Lab:** Feature flag off giữa chừng user đang dùng feature — graceful degrade; **Edge Case Lab:** Dark launch nhưng log bị expose ra UI — leak thông tin; **War Story:** "AB test không đủ sample size — kết luận sai"
+
+**Exit Criteria:** RBAC hoạt động 3 lớp: route, UI, API. Có feature flag kill switch cho tính năng rủi ro cao. Giải thích được Dark Launch vs Canary vs Progressive Rollout.
+
+---
+
+### Module 4.9 — Real-time & SSE
+
+**Kiến thức:**
+- SSE (Server-Sent Events): 1-way, lightweight, auto-reconnect
+- Role-based UI: admin vs user view
+- Real-time metrics update
+
+**Spiral 3 vòng:**
+- **V1:** Implement role-based UI, SSE cho real-time chart
+- **V2:** Test SSE reconnect, handle connection drop
+- **V3:** **Edge Case Lab:** User đổi role giữa chừng session — UI update real-time?
+
+**Exit Criteria:** Admin thấy tất cả, User chỉ thấy data của mình. Real-time metrics update mượt.
+
+---
+
+### Module 4.10 — Observability *(Bổ sung ADR + OpenTelemetry)*
+
+**Kiến thức:**
+- **Logs:** structured logging (JSON), log levels, correlation ID (để trace 1 request xuyên suốt)
+- **Metrics:** custom metrics (business + technical), dashboard (Grafana/DataDog), RED method (Rate, Errors, Duration)
+- **Tracing:** distributed tracing (OpenTelemetry), trace ID, span, parent-child relationship
+- **OpenTelemetry JS:** `@opentelemetry/sdk-trace-web`, auto-instrumentation, custom span, context propagation qua `fetch` headers, W3C Trace Context
+- **RUM (Real User Monitoring):** đo Core Web Vitals thật của user (field data), khác lab data (Lighthouse)
+- **Session Replay:** Sentry Replay / LogRocket — xem lại hành trình user gặp lỗi
+- **Alerting:** PagerDuty/Opsgenie, alert threshold (không alert quá nhiều — alert fatigue), runbook cho từng alert
+- **Synthetic Monitoring:** ping uptime, check API endpoint định kỳ từ nhiều region
+
+**Spiral 3 vòng:**
+- **V1:** Setup Sentry RUM cho dashboard, custom metrics cho "page load time"
+- **V2:** Thêm structured logging với correlation ID; setup OpenTelemetry trace cho 1 user flow (login → fetch dashboard → render chart); setup alert khi error rate > 1%
+- **V3:** **Edge Case Lab:** Alert trigger liên tục — "flapping" (lên xuống ngưỡng) — fix bằng hysteresis hoặc "alert after N lần liên tiếp"; **Edge Case Lab:** Trace ID mất khi qua BFF layer — fix bằng propagation header
+
+**Exit Criteria:** Phân biệt được Logs vs Metrics vs Traces. Có RUM đo CWV thật. Có OpenTelemetry trace xuyên suốt 1 user flow. Có alert với runbook.
+
+---
+
+### Module 4.11 — CI/CD Nâng Cao *(Bổ sung ADR)*
+
+**Kiến thức:**
+- **Canary Deploy:** deploy 5% traffic → monitor → 50% → 100%; rollback nếu error rate tăng
+- **Blue-Green Deploy:** 2 môi trường production, switch instant, zero-downtime rollback
+- **Release Workflow:** Git Flow / Trunk Based, release branch, hotfix branch, tag
+- **Changesets:** versioning monorepo package, automated changelog, dependency graph
+- **Preview Deploy:** mỗi PR có URL riêng để test, không ảnh hưởng staging
+
+**Spiral 3 vòng:**
+- **V1:** Setup GitHub Actions với matrix test, deploy staging + production
+- **V2:** Implement preview deploy cho mỗi PR; setup changesets cho monorepo
+- **V3:** **Edge Case Lab:** Canary deploy phát hiện lỗi — rollback trong 2 phút; **War Story:** "Deploy Friday evening — không có canary, production crash cả đêm"
+
+**Exit Criteria:** Có preview deploy cho mỗi PR. Hiểu được Canary vs Blue-Green. Có changesets cho monorepo.
+
+---
+
+### Module 4.12 — Accessibility Sâu
+
+**Kiến thức:**
+- WCAG 2.1 AA audit trên data table: roving `tabindex`, `aria-selected`, `role="tablist"`
+- Screen reader cho bảng dữ liệu lớn: `sr-only`, live regions
+- `jest-axe` để test accessibility tự động
+
+**Spiral 3 vòng:**
+- **V1:** Audit dashboard bằng axe DevTools
+- **V2:** Test bằng screen reader thật (NVDA/VoiceOver)
+- **V3:** **Edge Case Lab:** Custom Select — screen reader đọc đúng "3 of 10"
+
+**Exit Criteria:** Dashboard pass WCAG AA audit, keyboard navigation hoạt động cho data table.
+
+---
+
+### Module 4.13 — RADIO Practice #1
+
+**Kiến thức:**
+- Khung RADIO: Requirements → Architecture → Data Model → Interface → Optimizations
+- Đề: thiết kế 1 dashboard component tái sử dụng
+
+**Spiral 3 vòng:**
+- **V1:** Học khung RADIO, đọc Frontend Interview Handbook
+- **V2:** Luyện 1 đề/tuần, nói to suy nghĩ, record lại
+- **V3:** **Edge Case Lab:** "Thiết kế cho 1 triệu user" — scale từ 100 user lên 1M
+
+**Exit Criteria:** Trình bày được khung RADIO không cần nhìn tài liệu. Thiết kế xong 1 đề trong 45 phút.
+
+**Deliverable Stage 4:** Project 3 — Enterprise dashboard, RBAC, real-time SSE, virtual scroll, Web Workers, monorepo, CI/CD nâng cao, observability (OpenTelemetry + RUM), RADIO practice log bắt đầu.
+
+---
+
+## STAGE 5 — PROJECT 4: REAL-TIME SOCIAL FEED (Twitter/X Clone)
+
+> Business context: Feed real-time, tương tác nhanh, scale được.  
+> Kiến thức mới cover: AI Integration, Streaming, Animation nâng cao, Mobile Web real-time.
+
+---
+
+### Module 5.1 — WebSockets & Real-time
+
+**Kiến thức:**
+- Socket.io: connection, rooms, namespaces, real-time feed + live comment
+- Reconnect: exponential backoff, circuit breaker
+- So sánh WebSocket vs SSE vs Long Polling
+
+**Spiral 3 vòng:**
+- **V1:** Xây real-time feed bằng Socket.io
+- **V2:** Handle reconnect, duplicate event khi reconnect
+- **V3:** **Edge Case Lab:** WebSocket reconnect storm — 1000 client reconnect cùng lúc
+
+**Exit Criteria:** Real-time feed hoạt động, không duplicate event, reconnect gracefully.
+
+---
+
+### Module 5.2 — Optimistic Update Nâng Cao
+
+**Kiến thức:**
+- Kết hợp TanStack Query + WebSocket event để update UI trước khi server xác nhận
+- Rollback logic khi API fail
+- Race condition: like → unlike → like nhanh
+
+**Spiral 3 vòng:**
+- **V1:** Implement optimistic like/comment
+- **V2:** Handle rollback, test race condition
+- **V3:** **Edge Case Lab:** User like nhanh 3 lần — optimistic update out of order
+
+**Exit Criteria:** Optimistic update hoạt động, rollback khi fail, không race condition.
+
+---
+
+### Module 5.3 — Animation Nâng Cao & Motion
+
+**Kiến thức:**
+- Framer Motion: `layout` prop, `drag`, gesture, `AnimatePresence` mode="popLayout"
+- Layout animation: auto-animate height/width mượt
+- View Transitions API: native page transition (Chrome 126+)
+- `useViewTransition` trong Next.js
+
+**Spiral 3 vòng:**
+- **V1:** Thêm animation enter/exit cho post, like burst
+- **V2:** Layout animation cho reorder feed; thử View Transitions API
+- **V3:** **Edge Case Lab:** Layout animation trên list 1000 items — performance drop, chỉ animate visible items
+
+**Exit Criteria:** Animation 60fps trên feed dài. Tôn trọng `prefers-reduced-motion`.
+
+---
+
+### Module 5.4 — Mobile Web Real-time
+
+**Kiến thức:**
+- Touch gesture: pull-to-refresh, swipe-to-dismiss post
+- Virtual Keyboard: composer không bị che bởi keyboard
+- Safe Area: header/footer tránh notch
+- Mobile Performance: image lazy load, `content-visibility`, `contain`
+
+**Spiral 3 vòng:**
+- **V1:** Pull-to-refresh, swipe-to-dismiss, fix keyboard composer
+- **V2:** Test trên real device, đo INP khi scroll feed dài
+- **V3:** **Edge Case Lab:** User mở keyboard rồi xoay màn hình — layout break
+
+**Exit Criteria:** Feed real-time chạy mượt trên mobile. INP < 200ms trên thiết bị trung bình.
+
+---
+
+### Module 5.5 — AI Integration *(Bổ sung ADR)*
+
+**Kiến thức:**
+- **LLM API:** Anthropic/OpenAI SDK, streaming response (`ReadableStream`), abort controller
+- **AI SDK (Vercel):** `useChat`, `useCompletion`, `streamText`, `generateText`
+- **Prompt Engineering:** system prompt, few-shot, chain-of-thought, structured output (JSON mode / `zod-to-json-schema`)
+- **Function Calling / Tool Calling:** LLM gọi API bên ngoài (search, calculator), `tools` parameter
+- **MCP (Model Context Protocol):** kết nối LLM với data source (database, file system), context sharing
+- **Structured Output:** `zod` schema → LLM trả về JSON đúng shape, validation, retry nếu malformed
+
+**Spiral 3 vòng:**
+- **V1:** Tích hợp AI chat vào social feed (ví dụ: AI summarize thread); dùng Vercel AI SDK
+- **V2:** Thêm Function Calling: AI search post trong feed; dùng structured output để trả về JSON
+- **V3:** **Edge Case Lab:** AI stream response giữa chừng bị abort — cleanup đúng cách, không memory leak; **War Story:** "AI trả về JSON malformed — parse fail, crash UI"
+
+**Exit Criteria:** Tích hợp LLM API với streaming, function calling, structured output. Handle abort và malformed JSON.
+
+---
+
+### Module 5.6 — File Upload & Web Workers
+
+**Kiến thức:**
+- Drag-drop, preview, upload progress, cancel upload
+- Web Workers cho image compression trước khi gửi
+
+**Spiral 3 vòng:**
+- **V1:** Implement drag-drop upload với progress
+- **V2:** Thêm Worker compress image, cancel upload
+- **V3:** **Edge Case Lab:** Upload file 100MB — progress bar chính xác, không block UI
+
+**Exit Criteria:** Upload hoạt động, có progress, cancel được, image compressed.
+
+---
+
+### Module 5.7 — Dynamic SEO
+
+**Kiến thức:**
+- Meta tags động theo từng post, OG image generation (`@vercel/og`)
+- Canonical URLs, sitemap động cho large site
+
+**Spiral 3 vòng:**
+- **V1:** Setup dynamic meta cho từng post
+- **V2:** Generate OG image động
+- **V3:** **Edge Case Lab:** Post bị xoá — redirect 301, cập nhật sitemap
+
+**Exit Criteria:** Mỗi post có meta tags động, OG image, Google index đúng.
+
+---
+
+### Module 5.8 — RADIO Practice #2
+
+**Đề gợi ý:** Thiết kế News Feed hoặc Autocomplete.
+
+**Spiral 3 vòng:**
+- **V1:** Luyện đề, record bản thân
+- **V2:** Mock interview với bạn bè/AI interviewer
+- **V3:** Nhận feedback, iterate cách trình bày
+
+**Exit Criteria:** Hoàn thành đề trong 45 phút, có người phản biện.
+
+**Deliverable Stage 5:** Project 4 — Real-time social feed, AI integration, animation nâng cao, mobile real-time, dynamic SEO.
+
+---
+
+## STAGE 6 — PROJECT 5: DESIGN SYSTEM + COMPONENT LIBRARY
+
+> Business context: Tech lead team 10+ dev. Kiến thức mới cover: Frontend Architecture, Micro-frontends, CI/CD publish.
+
+---
+
+### Module 6.1 — Design Tokens
+
+**Kiến thức:**
+- Primitive → Semantic → Component-level tokens
+- Style Dictionary: export sang CSS/JS/iOS/Android/Figma
+- CSS Variables + Tailwind config
+
+**Spiral 3 vòng:**
+- **V1:** Xây token system cho project
+- **V2:** Export token sang nhiều platform
+- **V3:** **Edge Case Lab:** Designer đổi primary color — update 1 chỗ, tất cả app đổi cùng lúc
+
+**Exit Criteria:** Token system hoạt động, update 1 chỗ thay đổi toàn bộ.
+
+---
+
+### Module 6.2 — Radix UI & Accessibility Patterns *(Bổ sung Shadow DOM nâng cao)*
+
+**Kiến thức:**
+- Dialog, Select, Tabs: focus trap, roving `tabindex`, `aria-expanded`, `aria-selected`
+- Compound Components pattern (dùng lại Module 0.3)
+- **Shadow DOM trong Design System:** style encapsulation cho component library, `adoptedStyleSheets` để share theme, `::part()` để cho phép customization từ consumer, trade-off Shadow DOM vs CSS-in-JS vs CSS Modules
+
+**Spiral 3 vòng:**
+- **V1:** Build component dựa trên Radix primitives
+- **V2:** Test accessibility bằng screen reader; wrap 1 component bằng Shadow DOM để test encapsulation
+- **V3:** **Edge Case Lab:** Modal trong Modal — focus trap lồng nhau, z-index stacking context; **Edge Case Lab:** Shadow DOM component cần nhận theme từ host — dùng `::part()`, CSS custom properties, hoặc `theme` attribute
+
+**Exit Criteria:** Component accessible, pass axe DevTools, keyboard navigation hoạt động. Giải thích được khi nào dùng Shadow DOM trong design system.
+
+---
+
+### Module 6.3 — Custom Complex Components
+
+**Kiến thức:**
+- Combobox (autocomplete + keyboard nav), Date Picker (i18n)
+- Data Grid: sort, filter, pagination, row selection, virtual scroll
+- Factory pattern cho validator/renderer động theo field type
+
+**Spiral 3 vòng:**
+- **V1:** Xây từng component phức tạp (Data Grid, Combobox, Date Picker)
+- **V2:** Test edge case: 10K rows, nhiều locale, keyboard nav, screen reader
+- **V3:** **Edge Case Lab:** Data Grid — user select all 10K rows, memory không explode; **War Story:** "Date Picker không work trên Safari — input type `date` inconsistent"
+
+**Exit Criteria:** 15+ components hoạt động, accessible, customizable, không dùng `any`.
+
+---
+
+### Module 6.4 — Storybook, Chromatic & Publish
+
+**Kiến thức:**
+- Storybook: setup, stories, controls, MDX docs, actions addon, viewport
+- Chromatic: visual regression, UI review workflow, branch-based baselines
+- Publish package: npm/GitHub Packages, semantic versioning, changelog, `changesets`
+
+**Spiral 3 vòng:**
+- **V1:** Setup Storybook, viết stories cho tất cả components
+- **V2:** Setup Chromatic, visual regression test, block PR nếu visual change unintended
+- **V3:** **Edge Case Lab:** Breaking change không báo trước — semantic versioning, migration guide, deprecation warning 2 version trước khi xóa
+
+**Exit Criteria:** Package publishable, Storybook documented, Chromatic visual regression pass trong CI.
+
+---
+
+### Module 6.5 — Micro-frontends
+
+**Kiến thức:**
+- Module Federation: host/remote, shared dependencies, dynamic remote loading, version conflict resolution
+- Single-SPA: register application, lifecycle methods, multi-framework
+- State sharing giữa MFE: shared storage, event bus, URL state (không dùng global event emitter vô tội vạ)
+- **Web Components interop:** dùng Custom Elements để wrap React/Vue/Angular component, share qua Shadow DOM, tránh CSS leak
+
+**Spiral 3 vòng:**
+- **V1:** Setup Module Federation demo: shell app + 2 remote apps
+- **V2:** Share React version giữa host và remote; handle version mismatch; wrap 1 component bằng Web Component để dùng cross-framework
+- **V3:** **Edge Case Lab:** 2 MFE dùng khác version React — resolve conflict bằng `singleton: true` hoặc isolate; **Edge Case Lab:** CSS từ MFE A leak sang MFE B — dùng Shadow DOM hoặc CSS-in-JS scope; **War Story:** "CSS từ MFE A leak sang MFE B — dùng Shadow DOM hoặc CSS-in-JS scope"
+
+**Exit Criteria:** Giải thích được khi nào cần micro-frontend (nhiều team lớn, deploy độc lập), khi nào over-engineering (1 team nhỏ). Demo chạy được. Web Component interop hoạt động.
+
+---
+
+### Module 6.6 — Dark Mode & Animation Tokens
+
+**Kiến thức:**
+- Token cho dark mode: `darkMode: 'class'` vs `media`, `dark:` prefix
+- Animation tokens: duration, easing, `prefers-reduced-motion`
+- Micro-interaction: button press, toggle switch, toast enter/exit
+
+**Spiral 3 vòng:**
+- **V1:** Implement dark mode cho toàn bộ design system
+- **V2:** Thêm animation tokens vào Style Dictionary
+- **V3:** **Edge Case Lab:** Dark mode flash khi load — hydrate mismatch, fix bằng inline script set theme trước khi render
+
+**Exit Criteria:** Dark mode hoạt động, không flash, animation consistent, tôn trọng `prefers-reduced-motion`.
+
+---
+
+### Module 6.7 — Testing
+
+**Kiến thức:**
+- Coverage đầy đủ cho từng component: behavior, accessibility, visual
+- Visual regression test qua Chromatic là bắt buộc trước khi publish version mới
+- `jest-axe` cho a11y test tự động trong CI
+
+**Spiral 3 vòng:**
+- **V1:** Viết test cho tất cả components (Vitest + Testing Library)
+- **V2:** Setup Chromatic trong CI — block publish nếu visual change
+- **V3:** **Edge Case Lab:** Component thay đổi 1px — Chromatic bắt được không? Review và approve/reject
+
+**Exit Criteria:** Visual regression test pass trước mỗi publish. `jest-axe` pass trong CI.
+
+---
+
+### Module 6.8 — Documentation & RFC/ADR
+
+**Kiến thức:**
+- Contribution guide: ai được merge, coding convention, test requirement
+- Migration guide: breaking change → upgrade path
+- RFC/ADR: bối cảnh, lựa chọn đã cân nhắc (ít nhất 3), lý do chọn, rủi ro, người review
+
+**Spiral 3 vòng:**
+- **V1:** Viết README, contribution guide cho design system
+- **V2:** Viết ADR cho 1 quyết định kiến trúc (ví dụ: chọn Radix thay vì tự build)
+- **V3:** **War Story:** "Không có ADR, 6 tháng sau không ai nhớ tại sao chọn X — refactor sai hướng"
+
+**Exit Criteria:** Có ít nhất 1 ADR viết đúng format. Contribution guide rõ ràng.
+
+---
+
+### Module 6.9 — RADIO Practice #3
+
+**Đề gợi ý:** Thiết kế Component Library hoặc Autocomplete với accessibility + virtual scroll + multi-select.
+
+**Spiral 3 vòng:**
+- **V1:** Luyện đề, record bản thân, tự chấm điểm
+- **V2:** Mock interview với bạn bè/mentor/AI interviewer
+- **V3:** Nhận feedback về cách trình bày trade-off, iterate
+
+**Exit Criteria:** Hoàn thành đề trong 45 phút, có người phản biện, đề cập graceful degradation và accessibility.
+
+**Deliverable Stage 6:** Design system package published (npm/GitHub Packages), Storybook documented, Chromatic visual regression pass, 15+ components, dark mode, micro-frontend demo (có Web Components interop), ADR viết đúng format.
+
+---
+
+## STAGE 7 — PROJECT 6: LEGACY MIGRATION (jQuery → React)
+
+> Business context: Migrate app jQuery 5 năm tuổi sang React, không downtime, 10K+ users.  
+> Kiến thức mới cover: Strangler Fig, Web Components, interop, supply chain security, AI verify, production ops đầy đủ, judgment & war stories.
+
+---
+
+### Module 7.1 — Migration Strategy
+
+**Kiến thức:**
+- Strangler Fig Pattern: từng phần thay thế, không rewrite toàn bộ
+- Lên kế hoạch migrate từng feature, đánh giá rủi ro từng bước, rollback plan cho mỗi bước
+- URL routing: `/old/*` → jQuery, `/new/*` → React, dần redirect
+
+**Spiral 3 vòng:**
+- **V1:** Đọc case study migration (ví dụ: GitHub, Netflix), vẽ plan cho 1 app giả định
+- **V2:** Identify feature nào migrate trước (low risk, high value), feature nào giữ lại
+- **V3:** **War Story:** "Rewrite toàn bộ fail — mất 6 tháng, rollback về jQuery, user bỏ đi"
+
+**Exit Criteria:** Có migration plan chi tiết, không rewrite toàn bộ, có rollback plan từng bước.
+
+---
+
+### Module 7.2 — Web Components & Interop
+
+**Kiến thức:**
+- Custom element wrap React component → dùng trong jQuery app (`customElements.define`, `connectedCallback`, `disconnectedCallback`)
+- iframe embedding, `postMessage` communication với origin validation
+- jQuery interop: gọi plugin từ React (ref + cleanup), expose React event ra jQuery
+
+**Spiral 3 vòng:**
+- **V1:** Wrap 1 React component (Button) thành custom element, dùng trong jQuery page
+- **V2:** iframe bridge giữa legacy và React app, `postMessage` với `event.origin` check
+- **V3:** **Edge Case Lab:** jQuery plugin cũ không có document — reverse engineer bằng đọc source, wrap vào React với đúng lifecycle
+
+**Exit Criteria:** jQuery page có thể embed React component. React page có thể dùng jQuery plugin cũ. Không leak memory.
+
+---
+
+### Module 7.3 — Implement Migration Thực Chiến
+
+**Kiến thức:**
+- Chạy song song jQuery + React trên cùng 1 domain
+- Migrate 1 feature thật (ví dụ: user profile page): UI + logic + API
+- Test tích hợp: tracking event, global state, CSS không conflict
+
+**Spiral 3 vòng:**
+- **V1:** Migrate 1 page đơn giản (settings, profile) sang React
+- **V2:** Test integration: Google Analytics event vẫn fire đúng, CSS không leak
+- **V3:** **Edge Case Lab:** CSS từ jQuery leak sang React — isolate bằng Shadow DOM hoặc CSS naming convention (BEM/utility)
+
+**Exit Criteria:** 1–2 page đã migrate, chạy song song ổn định, user không nhận ra đang chuyển đổi.
+
+---
+
+### Module 7.4 — Supply Chain Security
+
+**Kiến thức:**
+- Lockfile integrity: `npm audit` không đủ, cần hiểu transitive dependencies
+- npm provenance: verify package đến từ CI đúng của repo
+- Dependency confusion: tên package giống internal bị publish public
+- Theo dõi CVE framework (Next.js, React, Node), patch trong 24–48h
+
+**Spiral 3 vòng:**
+- **V1:** Audit dependencies của project mới, tìm known vulnerabilities
+- **V2:** Setup Dependabot/Dependabot-like alerting; verify lockfile không bị sửa tay bừa
+- **V3:** **War Story:** "Thêm 1 package mới làm app crash vì transitive dependency conflict — `lodash` + `lodash-es` + `lodash.throttle` 3 version trong bundle"
+
+**Exit Criteria:** Giải thích được dependency confusion, lockfile poisoning. Có kế hoạch patch CVE trong 24h.
+
+---
+
+### Module 7.5 — AI Coding Agent — Verify Workflow
+
+**Kiến thức:**
+- Giao task đa bước cho Claude Code/Cursor: phạm vi rõ ràng, tránh agent sửa ngoài scope
+- Verify có hệ thống: edge case, accessibility, security — không chỉ đọc lướt
+- Biết khi nào KHÔNG dùng AI: business logic phức tạp, security/payment, refactor kiến trúc lớn
+
+**Spiral 3 vòng:**
+- **V1:** Dùng AI generate code migration (jQuery → React), review từng dòng
+- **V2:** Tìm bug AI tạo ra: logic gần đúng nhưng sai edge case (ví dụ: không handle `null` trong jQuery selector)
+- **V3:** **War Story:** "Merge code AI vì 'chạy được' — 2 ngày sau tester báo form crash khi paste emoji. AI không validate unicode."
+
+**Exit Criteria:** Có checklist verify AI output (edge case, a11y, security, performance). Không merge code AI mà không đọc kỹ.
+
+---
+
+### Module 7.6 — Production Ops Đầy Đủ
+
+**Kiến thức:**
+- RUM (Real User Monitoring): đo CWV thật của user, khác lab data
+- Feature Flags nâng cao: rollout %, kill switch, targeting theo user segment
+- Rollback drill thật: không chỉ setup rồi để đó — thực hiện rollback 1 lần/tháng
+- Backup test restore thật: `pg_dump` cron, test restore lên staging
+
+**Spiral 3 vòng:**
+- **V1:** Setup RUM, feature flag cho migration (hiện React page cho 5% user)
+- **V2:** Thực hiện rollback drill: tắt feature flag, verify app ổn định trong 5 phút
+- **V3:** **War Story:** "Incident 2 giờ sáng — quyết định feature flag off vs rollback vs fix ngay. Không sửa ngay lúc nửa đêm dưới pressure."
+
+**Exit Criteria:** Có runbook incident response. Đã thực hiện rollback drill ít nhất 1 lần. Backup restore test pass.
+
+---
+
+### Module 7.7 — Judgment & War Stories
+
+**Kiến thức:**
+- Luyện đủ 6 tình huống thực chiến:
+  1. PM ép deadline
+  2. BE trả API sai shape
+  3. Main thread block 10K items
+  4. Code review bất đồng pattern
+  5. AI tạo code gần đúng
+  6. Incident 2 giờ sáng
+
+**Spiral 3 vòng:**
+- **V1:** Đọc 6 war stories, hiểu format: Bối cảnh → Ràng buộc → Lựa chọn → Quyết định → Trade-off → Bài học
+- **V2:** Simulate 1–2 tình huống với project của mình (ví dụ: giả lập incident 2 giờ sáng bằng cách tạo bug production trên staging)
+- **V3:** **Teach Back:** Viết blog/vlog về 1 tình huống, nhận feedback từ cộng đồng
+
+**Exit Criteria:** Kể được 2–3 war stories theo format STAR/Bối cảnh → Quyết định → Trade-off → Bài học. Không defensive khi kể.
+
+---
+
+### Module 7.8 — RADIO Practice #4
+
+**Đề gợi ý:** Thiết kế Migration Strategy hoặc E-commerce Checkout với graceful degradation + offline support.
+
+**Spiral 3 vòng:**
+- **V1:** Luyện đề, record bản thân, tự chấm điểm
+- **V2:** Mock interview với người phản biện
+- **V3:** Nhận feedback, iterate cách trình bày trade-off
+
+**Exit Criteria:** Hoàn thành đề trong 45 phút, đề cập rollback strategy, feature flag, và monitoring.
+
+**Deliverable Stage 7:** Project 6 hoàn chỉnh — demo song song jQuery + React trên cùng 1 domain, 1–2 page migrated, rollback drill thực hiện, war stories documented.
+
+---
+
+## STAGE 8 — TỔNG HỢP & SẴN SÀNG PHỎNG VẤN (Không có project mới)
+
+> Đây không phải "học thêm" — đây là consolidation. Nếu Stage 0–7 đã làm đúng Exit Criteria, Stage 8 chỉ là ôn và luyện phản xạ.  
+> **Nhắc nhở:** Sau Stage 8, quay lại Stage 0 với góc nhìn mới — đó là **Core Loop**.
+
+---
+
+### Module 8.1 — Portfolio Site
+
+**Kiến thức:**
+- Tổng hợp 6 project: README chi tiết (setup, architecture, decisions, trade-offs), demo link, tech stack
+- Video demo 2–3 phút mỗi project: nói về problem, solution, trade-off, kết quả đo được (performance, accessibility, conversion)
+- GitHub profile optimized: pinned repos, bio rõ ràng, contribution graph active, open source contribution nếu có
+
+**Spiral 3 vòng:**
+- **V1:** Xây portfolio site tổng hợp bằng Next.js
+- **V2:** Quay video demo, viết README chi tiết cho từng repo
+- **V3:** **Edge Case Lab:** Portfolio site chính cũng phải pass Lighthouse CI, a11y audit, có ADR cho chính quyết định kiến trúc của nó
+
+**Exit Criteria:** Portfolio site live, có video demo, GitHub profile optimized.
+
+---
+
+### Module 8.2 — RADIO Mock Interview Cường Độ Cao
+
+**Kiến thức:**
+- Mock full 45 phút có người phản biện (hoặc AI đóng vai interviewer)
+- Checklist tự chấm điểm: hỏi requirements (5 phút), RADIO framework đúng, nói to suy nghĩ, đề cập trade-offs, đề cập graceful degradation, đề cập accessibility, đề cập security, đề cập monitoring
+
+**Spiral 3 vòng:**
+- **V1:** Luyện 3 đề/tuần, record bản thân, tự chấm điểm theo checklist
+- **V2:** Mock interview với bạn bè/mentor/AI — nhận feedback về cách trình bày, tốc độ nói, độ rõ ràng
+- **V3:** **Edge Case Lab:** Interviewer hỏi ngược: "Tại sao không dùng micro-frontend?" / "Nếu traffic tăng 10x thì sao?" / "Nếu API này fail nhưng API kia vẫn chạy?" — luyện trả lời không defensive, dựa trên data
+
+**Exit Criteria:** Hoàn thành ít nhất 10 mock interview full 45 phút, có recording để xem lại tiến bộ. Không nhảy vào giải pháp trong 5 phút đầu.
+
+---
+
+### Module 8.3 — Live Coding Practice
+
+**Kiến thức:**
+- Modal từ đầu: focus trap, Escape to close, scroll lock, ARIA, animation
+- Dropdown/Select: keyboard navigation (↑↓, Enter, Escape), `aria-expanded`, positioning (không bị cut bởi `overflow: hidden`)
+- Data Table: sort, filter, pagination, row selection, virtual scroll
+- Optimize React component: dùng Profiler tìm unnecessary render, apply memoization đúng cách
+- Debug TypeScript error: đọc error message, fix không dùng `as` hoặc `@ts-ignore`
+
+**Spiral 3 vòng:**
+- **V1:** Live code 1 component/tuần trong 30–45 phút, không nhìn tài liệu
+- **V2:** Thêm yêu cầu "thay đổi" giữa chừng (interviewer bảo "giờ thêm feature X") — luyện adapt
+- **V3:** **Edge Case Lab:** Live code xong, interviewer hỏi: "Còn cách nào khác không? Trade-off là gì?" — luyện trả lời dạng "Tôi chọn X vì Y, nhưng nếu Z tôi sẽ cân nhắc W"
+
+**Exit Criteria:** Live code được Modal, Dropdown, Data Table trong 30–45 phút không nhìn tài liệu. Giải thích được trade-off của từng quyết định.
+
+---
+
+### Module 8.4 — Ôn Tập Tổng Hợp Security + Testing + Observability
+
+**Kiến thức:**
+- Security: XSS, CSRF, CSP, CORS, Auth, SOP, `iframe sandbox`, COOP/COEP/CORP, Trusted Types, supply chain
+- Testing: Unit, Integration, E2E, MSW, visual regression, `jest-axe`
+- Observability: Logs, Metrics, Traces, RUM, Session Replay, Alerting, OpenTelemetry
+
+**Spiral 3 vòng:**
+- **V1:** Làm 1 bài audit security cho chính portfolio site; làm 1 bài audit test coverage
+- **V2:** Tìm lỗ hổng còn sót trong project cũ, viết test còn thiếu
+- **V3:** **Edge Case Lab:** Simulate 1 bug security production — viết incident report đầy đủ (timeline, impact, root cause, fix, prevention)
+
+**Exit Criteria:** Tự audit được security và testing cho 1 project bất kỳ, tìm ra điểm yếu chưa phát hiện trước đó.
+
+---
+
+### Module 8.5 — Behavioral & Đàm Phán Lương
+
+**Kiến thức:**
+- STAR format: Situation, Task, Action, Result (kết quả đo được nếu có)
+- Chuẩn bị 5 câu chuyện thật: bug khó, bất đồng kỹ thuật, deadline gấp, mentor junior, incident
+- War Stories: 6 tình huống thực chiến đã luyện ở Stage 7
+- Đàm phán offer: base, equity, benefit, level — không chỉ nhận offer đầu tiên; biết "walk away" khi nào
+
+**Spiral 3 vòng:**
+- **V1:** Viết script STAR cho 7 câu hỏi phổ biến, luyện nói trước gương
+- **V2:** Mock behavioral interview với bạn bè, nhận feedback về sự tự tin và độ cụ thể
+- **V3:** **Edge Case Lab:** Interviewer hỏi: "Bạn có điểm yếu gì?" / "Tại sao bạn rời công ty cũ?" / "Mức lương mong muốn?" — luyện trả lời thật nhưng professional, không defensive, không khai báo số quá sớm
+
+**Exit Criteria:** Kể được 3–4 câu chuyện theo STAR trong 2 phút mỗi câu. Biết cách đàm phán base salary và equity. Có "walk away" number.
+
+---
+
+### Module 8.6 — Apply & Iterate
+
+**Kiến thức:**
+- CV optimized cho Senior FE: highlight project, metrics (performance improve X%, bug reduce Y%, test coverage Z%), không liệt kê công nghệ
+- Cover letter template: startup (move fast, ownership) vs enterprise (scale, process, mentorship)
+- Theo dõi application: Notion/Airtable, ghi lại công ty, vòng phỏng vấn, feedback, iterate
+- Follow up sau 1 tuần nếu không phản hồi
+
+**Spiral 3 vòng:**
+- **V1:** Apply 10+ job trong 1 tuần đầu tiên, ghi lại phản hồi
+- **V2:** Nếu không pass vòng CV — iterate CV. Nếu fail vòng live code — luyện lại Module 8.3. Nếu fail vòng System Design — luyện lại Module 8.2. Nếu fail vòng behavioral — luyện lại Module 8.5.
+- **V3:** **Edge Case Lab:** Nhận reject — phân tích nguyên nhân (không phải lúc nào cũng là "họ không hiểu giá trị của tôi"), điều chỉnh và apply tiếp
+
+**Exit Criteria:** Apply liên tục, iterate dựa trên feedback thực tế. Không giới hạn số lượng — đến khi có offer phù hợp.
+
+---
+
+## 9.8. CHECKPOINT TỰ ĐÁNH GIÁ (Mỗi 3 tháng)
+
+| Câu hỏi | Nếu trả lời "Không" → Quay lại |
+|---------|-------------------------------|
+| Tôi có giải thích được Event Loop cho junior không? | Stage 0, Module 0.1 |
+| Tôi có vẽ được Browser Rendering Pipeline không? | Stage 0, Module 0.2 |
+| Tôi có giải thích được HTTP/2 vs HTTP/3 không? | Stage 0, Module 0.6 |
+| Tôi có giải thích được Stacking Context và Containing Block không? | Stage 0, Module 0.2 |
+| Tôi có biết khi nào dùng rAF vs rIC vs `postTask` không? | Stage 0, Module 0.1x |
+| Tôi có xử lý được storage quota và eviction không? | Stage 0, Module 0.3 |
+| Tôi có viết được custom element với Shadow DOM không? | Stage 0, Module 0.3x |
+| Tôi có debug được bug production trong 30 phút không cần Google không? | Stage 0, Module 0.7 |
+| Tôi có thiết kế được API với cursor pagination không? | Stage 0, Module 0.6x |
+| Tôi có debug được hydration mismatch không cần Google? | Stage 2, Module 2.2 |
+| Tôi có viết được component accessible từ đầu không? | Stage 2, Module 2.4 |
+| Tôi có audit được WCAG AA không? | Stage 2, Module 2.4 |
+| Tôi có đo và giảm INP trên app thực không? | Stage 2, Module 2.13 |
+| Tôi có setup được CI/CD với preview deploy không? | Stage 2, Module 2.14 |
+| Tôi có thiết kế được caching strategy cho e-commerce không? | Stage 3, Module 3.6x |
+| Tôi có thiết kế được News Feed cho 1M user không? | Stage 4–8, RADIO Practice |
+| Tôi có setup được OpenTelemetry trace xuyên suốt không? | Stage 4, Module 4.10 |
+| Tôi có giải thích được Dark Launch vs Canary không? | Stage 4, Module 4.8 |
+| Tôi có xử lý được incident 2 giờ sáng không? | Stage 7, Module 7.6 |
+| Tôi có dạy lại được 1 junior không? | Toàn bộ — Teach Back |
+| Tôi có review PR và tìm ra lỗi security/performance không? | Deliberate Practice |
+| Tôi có viết được ADR với 3 lựa chọn đã cân nhắc không? | Stage 5, Module 5.8 / Stage 6, Module 6.8 |
+| Tôi có tự implement được 1 thư viện nhỏ không? | Spiral Vòng 3 các module |
+| Tôi có giải thích được PKCE và Refresh Token Rotation không? | Stage 2, Module 2.11 |
+| Tôi có setup được RUM và Alerting không? | Stage 4, Module 4.10 |
+| Tôi có tích hợp LLM API với streaming và function calling không? | Stage 5, Module 5.5 |
+| Tôi có migrate được jQuery → React không downtime không? | Stage 7, Module 7.3 |
+
+---
+
+## 9.9. TÀI LIỆU THAM KHẢO CHO DEEP DIVE
+
+| Mức độ | Tài liệu | Cách đọc |
+|--------|----------|----------|
+| **BẮT BUỘC** | "You Don't Know JS" — Kyle Simpson | Đọc 3 lần: lần 1 nhanh, lần 2 ghi chú, lần 3 dạy lại |
+| **BẮT BUỘC** | "How Browsers Work" (HTML5 Rocks / web.dev) | Vẽ pipeline sau mỗi chương |
+| **BẮT BUỘC** | "High Performance Browser Networking" — Ilya Grigorik | Đọc theo module HTTP, DNS, TLS, HTTP/2 |
+| **BẮT BUỘC** | React Source Code (github.com/facebook/react) | Đọc `ReactFiberWorkLoop.js`, `ReactHooks.js` |
+| **BẮT BUỘC** | Next.js Source Code (app router caching) | Đọc `next/packages/next/src/server/lib/` |
+| **BẮT BUỘC** | Zustand Source Code (~100 lines core) | Đọc để hiểu pub/sub pattern |
+| **BẮT BUỘC** | TanStack Query Source Code | Đọc caching mechanism, garbage collection |
+| **BẮT BUỘC** | React Scheduler Source (`packages/scheduler`) | Đọc để hiểu task priority, lane-based scheduling |
+| **NÊN ĐỌC** | "Effective TypeScript" — Dan Vanderkam | 62 items, mỗi item viết 1 demo |
+| **NÊN ĐỌC** | "Designing Data-Intensive Applications" — Martin Kleppmann | Ch 1-4 trước, sau đó đọc cả cuốn |
+| **NÊN ĐỌC** | OWASP Top 10 + Cheat Sheet | Đọc và implement từng lỗ hổng trong demo app |
+| **NÊN ĐỌC** | "JavaScript: The Definitive Guide" — David Flanagan | Ch 6, 9: Prototype, Class, this, Execution Context |
+| **NÊN ĐỌC** | Web.dev — Core Web Vitals, LoAF, Rendering | Đọc khi cần optimize cụ thể |
+| **NÊN ĐỌC** | "Inclusive Design Patterns" — Heydon Pickering | Accessibility từ gốc, không chỉ checklist |
+| **NÊN ĐỌC** | "The Design of Web APIs" — Arnaud Lauret | REST design, pagination, versioning, idempotency |
+| **THAM KHẢO** | V8 Blog (v8.dev) | Theo dõi monthly, đọc khi có update về GC hoặc compiler |
+| **THAM KHẢO** | Frontend Interview Handbook (frontendinterviewhandbook.com) | Đọc trước khi luyện RADIO |
+| **THAM KHẢO** | OpenTelemetry Documentation (opentelemetry.io) | Khi triển khai tracing |
+| **THAM KHẢO** | Web Components Spec (w3c.github.io/webcomponents/) | Khi cần hiểu sâu Shadow DOM |
+
+### Blog & Newsletter (Theo dõi hàng tuần)
+
+| Nguồn | Tại sao theo dõi |
+|-------|-----------------|
+| **Overreacted — Dan Abramov** | React core team, insights sâu về React internals |
+| **Kent C. Dodds Blog** | Testing, React patterns, career advice |
+| **Vercel Engineering Blog** | Next.js updates, best practices, case studies |
+| **Web.dev — Google** | Web standards, Core Web Vitals, performance |
+| **Josh W Comeau Blog** | CSS, React, animation — giải thích rất trực quan |
+| **Lee Robinson (Vercel)** | Next.js, React Server Components, performance |
+| **Ryan Florence (Remix)** | Routing, data loading, web fundamentals |
+| **Sarah Drasner (Google)** | Animation, SVG, creative coding |
+| **WebAIM** | Accessibility news, screen reader testing |
+
+### Repo Mẫu & Open Source (Đọc code, học pattern)
+
+| Repo | Tại sao đọc |
+|------|------------|
+| **shadcn/ui** | Cách tổ chức component, dùng Radix, Tailwind, TypeScript |
+| **TanStack Query** | Source code để hiểu caching mechanism |
+| **Zustand** | Source code rất ngắn (~100 lines core) — đọc để hiểu pattern |
+| **Next.js Commerce** | E-commerce template từ Vercel — học best practices |
+| **Cal.com** | Open source scheduling — học Next.js App Router, Prisma, tRPC |
+| **Radix UI Primitives** | Headless component, accessibility patterns |
+| **Vercel AI SDK** | LLM integration, streaming, function calling |
+| **Module Federation Examples** | Micro-frontend architecture, shared dependencies |
+| **OpenTelemetry JS** | Distributed tracing implementation |
+| **GoogleChrome/web-vitals** | Cách đo CWV chính xác trên field |
+
+---
+
+## KẾT THÚC PHẦN 9 (UPGRADED)
+
+> **"Không hời hợt, nghiên cứu sâu."**
+>
+> Với mindset này, bạn không còn "học để pass phỏng vấn" — bạn **học để trở thành người mà người khác tìm đến khi production gặp vấn đề**. Đó là định nghĩa của Senior 5+.
+>
+> Lộ trình này không có ngày kết thúc. Sau Stage 8, bạn quay lại Stage 0 với góc nhìn mới — đọc lại "You Don't Know JS" và thấy mình hiểu sâu hơn lần trước. Đọc lại V8 blog và thấy mình nắm được context. Đó là **Spiral Learning**: mỗi vòng xoắn ốc đưa bạn lên cao hơn, nhìn rộng hơn, nhưng vẫn đi trên chính nền tảng đã xây.
+>
+> **Quy tắc cuối cùng:** Không sang module sau khi chưa đạt Exit Criteria. Không học vội để "kịp timeline". Không so sánh với người khác. Chỉ so sánh với chính mình 3 tháng trước.
+>
+> **Mỗi checkbox trong checklist là một kiến thức bạn PHẢI giải thích được cho người khác. Nếu không giải thích được, chưa hiểu sâu — quay lại học.**
+>
+> **Học xong Khối 1 này, bạn không chỉ "sẵn sàng phỏng vấn Senior". Bạn đã xây được nền móng để học Khối 2 (Backend & Ecosystem) và Khối 3 (DevOps) một cách tự nhiên — vì bạn hiểu cả máy tính, trình duyệt, network, framework, lẫn cách một sản phẩm thực sự được xây dựng và vận hành.**
+>
+> **Phiên bản này đã tích hợp:** Core Loop vĩnh cửu, Scheduler, CSS Rendering Deep Dive, Browser Storage & Persistence, Web Components & Shadow DOM, API Design & Backend Contract, Debugging Methodology, Accessibility Engineering (module riêng), Caching Patterns & Invalidation, Feature Flags Nâng Cao (Dark Launch, Progressive Rollout), OpenTelemetry & Distributed Tracing, Shadow DOM trong Design System.
